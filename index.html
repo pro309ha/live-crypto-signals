@@ -2,193 +2,194 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>APEX SIGNALS — Trading Terminal</title>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>APEX SIGNALS</title>
 <script src="https://unpkg.com/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.js"></script>
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&family=Rajdhani:wght@400;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
 <style>
 :root{
-  --gold:#FFD700;--gold-dim:#B8960C;--gold-glow:rgba(255,215,0,0.2);--gold-deep:#6A5000;
-  --bg:#020305;--panel:#07080D;--card:#0B0D16;--border:#181B2A;
-  --green:#00FF88;--green-dim:#00AA55;--green-glow:rgba(0,255,136,0.15);
-  --red:#FF2D55;--red-dim:#AA1133;--red-glow:rgba(255,45,85,0.15);
-  --text:#DDDDF0;--dim:#4A4A6A;--muted:#1E1E2E;
+  --g:#FFD700;--gd:#A07800;--gg:rgba(255,215,0,0.18);
+  --bg:#010204;--pn:#060810;--cd:#0A0C15;--br:#141728;
+  --gr:#00FF88;--rd:#FF2D55;
+  --tx:#D8D8EE;--dm:#404060;--mt:#1A1A2A;
 }
-*{margin:0;padding:0;box-sizing:border-box}
-html,body{width:100%;max-width:100vw;overflow-x:hidden;background:var(--bg);color:var(--text);font-family:'Rajdhani',sans-serif;-webkit-tap-highlight-color:transparent}
-body::after{content:'';position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(0,0,0,0.02) 3px,rgba(0,0,0,0.02) 4px);pointer-events:none;z-index:9000}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{width:100%;overflow-x:hidden;background:var(--bg);color:var(--tx);font-family:'Rajdhani',sans-serif}
 
 /* HEADER */
-.hdr{display:flex;align-items:center;padding:9px 12px;background:var(--panel);border-bottom:1px solid var(--border);position:relative;gap:8px;flex-wrap:wrap}
-.hdr::after{content:'';position:absolute;bottom:-1px;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent)}
-.logo{display:flex;align-items:center;gap:8px;flex-shrink:0}
-.lhex{width:28px;height:28px;background:linear-gradient(135deg,var(--gold),var(--gold-dim));clip-path:polygon(50% 0,100% 25%,100% 75%,50% 100%,0 75%,0 25%);flex-shrink:0;box-shadow:0 0 10px var(--gold-glow);animation:hpulse 3s ease-in-out infinite}
-@keyframes hpulse{0%,100%{box-shadow:0 0 8px var(--gold-glow)}50%{box-shadow:0 0 20px var(--gold-glow),0 0 40px rgba(255,215,0,0.08)}}
-.lt{font-family:'Orbitron',monospace;font-size:12px;font-weight:900;color:var(--gold);letter-spacing:3px;white-space:nowrap}
-.ls{font-family:'Share Tech Mono',monospace;font-size:7px;color:var(--dim);letter-spacing:2px;margin-top:1px}
-.psw{display:flex;background:var(--card);border:1px solid var(--border);border-radius:3px;overflow:hidden;margin-left:auto}
-.pb{padding:5px 12px;background:transparent;border:none;color:var(--dim);font-family:'Orbitron',monospace;font-size:8px;font-weight:700;letter-spacing:2px;cursor:pointer;transition:all .25s;white-space:nowrap}
-.pb.on{color:#000;background:linear-gradient(135deg,var(--gold),var(--gold-dim))}
-.pb:not(.on):hover{color:var(--gold)}
-.hr{display:flex;align-items:center;gap:8px;flex-shrink:0}
-.li{display:flex;align-items:center;gap:4px;font-family:'Share Tech Mono',monospace;font-size:8px}
-.dot{width:6px;height:6px;border-radius:50%;background:var(--dim);flex-shrink:0}
-.dot.ok{background:var(--green);box-shadow:0 0 6px var(--green);animation:blink 1.5s ease-in-out infinite}
-.dot.err{background:var(--red)}.dot.warn{background:var(--gold)}
-@keyframes blink{0%,100%{opacity:1}50%{opacity:.25}}
-#conn-lbl{font-family:'Share Tech Mono',monospace;font-size:8px;color:var(--dim)}
-.clk{font-family:'Orbitron',monospace;font-size:10px;color:var(--gold);letter-spacing:1px}
-.sb{background:var(--card);border:1px solid var(--gold-deep);color:var(--gold);padding:4px 8px;border-radius:3px;cursor:pointer;font-size:12px;line-height:1}
+.hdr{display:flex;align-items:center;padding:8px 10px;background:var(--pn);border-bottom:1px solid var(--br);gap:6px;flex-wrap:wrap;position:relative}
+.hdr::after{content:'';position:absolute;bottom:-1px;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--g),transparent)}
+.lhex{width:26px;height:26px;background:linear-gradient(135deg,var(--g),var(--gd));clip-path:polygon(50% 0,100% 25%,100% 75%,50% 100%,0 75%,0 25%);flex-shrink:0;animation:hp 3s ease-in-out infinite}
+@keyframes hp{0%,100%{filter:drop-shadow(0 0 5px var(--g))}50%{filter:drop-shadow(0 0 14px var(--g))}}
+.lt{font-family:'Orbitron',monospace;font-size:11px;font-weight:900;color:var(--g);letter-spacing:3px}
+.ls{font-family:'Share Tech Mono',monospace;font-size:6px;color:var(--dm);letter-spacing:2px;margin-top:1px}
+.psw{display:flex;background:var(--cd);border:1px solid var(--br);border-radius:3px;overflow:hidden;margin-left:auto}
+.pb{padding:5px 11px;background:transparent;border:none;color:var(--dm);font-family:'Orbitron',monospace;font-size:8px;font-weight:700;letter-spacing:2px;cursor:pointer;transition:.2s}
+.pb.on{color:#000;background:linear-gradient(135deg,var(--g),var(--gd))}
+.pb:not(.on):hover{color:var(--g)}
+.hr{display:flex;align-items:center;gap:7px;flex-shrink:0}
+.dot{width:6px;height:6px;border-radius:50%;background:var(--dm);transition:.3s;flex-shrink:0}
+.dot.ok{background:var(--gr);box-shadow:0 0 6px var(--gr);animation:bl 1.5s ease-in-out infinite}
+.dot.live{background:var(--gr);box-shadow:0 0 8px var(--gr)}
+.dot.warn{background:var(--g)}
+.dot.err{background:var(--rd)}
+@keyframes bl{0%,100%{opacity:1}50%{opacity:.2}}
+#clbl{font-family:'Share Tech Mono',monospace;font-size:7px;color:var(--dm);transition:.3s}
+.clk{font-family:'Orbitron',monospace;font-size:10px;color:var(--g)}
+.sndb{background:var(--cd);border:1px solid var(--gd);color:var(--g);padding:3px 7px;border-radius:3px;cursor:pointer;font-size:11px}
 
-/* PRICE ROW */
-.pr{display:flex;align-items:center;justify-content:space-between;padding:6px 12px;background:var(--panel);border-bottom:1px solid var(--border);flex-wrap:wrap;gap:4px}
-.cp{font-family:'Orbitron',monospace;font-size:22px;font-weight:900;color:var(--gold);text-shadow:0 0 15px var(--gold-glow);letter-spacing:.5px}
-.pc{font-family:'Share Tech Mono',monospace;font-size:10px;padding:2px 6px;border-radius:2px;margin-left:7px}
-.pc.up{color:var(--green);background:rgba(0,255,136,.08)}.pc.dn{color:var(--red);background:rgba(255,45,85,.08)}
-.tw{display:flex;align-items:center;gap:6px}
-.tl{font-family:'Share Tech Mono',monospace;font-size:7px;color:var(--dim);letter-spacing:2px}
-.ct{font-family:'Orbitron',monospace;font-size:17px;font-weight:700;color:var(--gold);padding:3px 9px;background:var(--card);border:1px solid var(--gold-deep);border-radius:3px;min-width:52px;text-align:center;transition:color .3s,border-color .3s}
-.ct.urg{color:var(--red)!important;border-color:var(--red-dim)!important;animation:shk .25s ease infinite}
-@keyframes shk{0%,100%{transform:translateX(0)}33%{transform:translateX(-1.5px)}66%{transform:translateX(1.5px)}}
+/* PRICE */
+.pr{display:flex;align-items:center;justify-content:space-between;padding:5px 10px;background:var(--pn);border-bottom:1px solid var(--br);flex-wrap:wrap;gap:4px}
+.cp{font-family:'Orbitron',monospace;font-size:20px;font-weight:900;color:var(--g);text-shadow:0 0 12px var(--gg)}
+.pc{font-family:'Share Tech Mono',monospace;font-size:9px;padding:1px 6px;border-radius:2px;margin-left:6px}
+.pc.up{color:var(--gr);background:rgba(0,255,136,.08)}.pc.dn{color:var(--rd);background:rgba(255,45,85,.08)}
+.tw{display:flex;align-items:center;gap:5px}
+.tl{font-family:'Share Tech Mono',monospace;font-size:6px;color:var(--dm);letter-spacing:2px}
+.ct{font-family:'Orbitron',monospace;font-size:16px;font-weight:700;color:var(--g);padding:2px 8px;background:var(--cd);border:1px solid var(--gd);border-radius:3px;min-width:50px;text-align:center}
+.ct.urg{color:var(--rd)!important;border-color:var(--rd)!important;animation:shk .2s ease infinite}
+@keyframes shk{0%,100%{transform:translateX(0)}33%{transform:translateX(-2px)}66%{transform:translateX(2px)}}
 
 /* CHART */
-#chart{position:relative;width:100%;height:56vw;min-height:240px;max-height:380px}
-@media(min-width:550px){#chart{height:340px;max-height:420px}}
-.lo{position:absolute;inset:0;background:var(--card);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:10;gap:12px;transition:opacity .3s}
-.ls2{width:38px;height:38px;border:2px solid var(--border);border-top-color:var(--gold);border-radius:50%;animation:spin 1s linear infinite}
+#ch{position:relative;width:100%;height:54vw;min-height:220px;max-height:360px}
+@media(min-width:500px){#ch{height:320px;max-height:400px}}
+.lo{position:absolute;inset:0;background:var(--cd);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:10;gap:10px;transition:opacity .4s}
+.lo.hide{opacity:0;pointer-events:none}
+.sp{width:36px;height:36px;border:2px solid var(--br);border-top-color:var(--g);border-radius:50%;animation:spin 1s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
-.ltx{font-family:'Orbitron',monospace;font-size:7px;color:var(--dim);letter-spacing:3px;text-align:center;padding:0 16px;line-height:2}
-.src-info{font-family:'Share Tech Mono',monospace;font-size:8px;color:var(--gold);text-align:center;padding:0 16px}
+.lmsg{font-family:'Orbitron',monospace;font-size:7px;color:var(--dm);letter-spacing:2px;text-align:center}
+.src{font-family:'Share Tech Mono',monospace;font-size:8px;color:var(--g);text-align:center}
+
+/* DATA SOURCE BADGE */
+.badge{position:absolute;top:6px;left:6px;z-index:5;font-family:'Share Tech Mono',monospace;font-size:7px;padding:2px 6px;border-radius:2px;border:1px solid var(--br);background:rgba(6,8,16,.8);color:var(--dm);display:none}
+.badge.show{display:block}
+.badge.live{color:var(--gr);border-color:rgba(0,255,136,.3)}
+.badge.demo{color:var(--g);border-color:rgba(255,215,0,.3)}
 
 /* INDICATORS */
-.ind{display:grid;grid-template-columns:repeat(2,1fr);background:var(--border);gap:1px}
-@media(min-width:400px){.ind{grid-template-columns:repeat(4,1fr)}}
-.ib{background:var(--card);padding:5px 10px}
-.il{font-family:'Share Tech Mono',monospace;font-size:6px;color:var(--dim);letter-spacing:2px;margin-bottom:2px}
+.ind{display:grid;grid-template-columns:repeat(2,1fr);background:var(--br);gap:1px}
+@media(min-width:380px){.ind{grid-template-columns:repeat(4,1fr)}}
+.ib{background:var(--cd);padding:5px 9px}
+.il{font-family:'Share Tech Mono',monospace;font-size:6px;color:var(--dm);letter-spacing:1px;margin-bottom:2px}
 .iv{font-family:'Orbitron',monospace;font-size:10px;font-weight:700;transition:color .3s}
-.iv.bull{color:var(--green)}.iv.bear{color:var(--red)}.iv.neu{color:var(--gold)}
+.iv.bull{color:var(--gr)}.iv.bear{color:var(--rd)}.iv.neu{color:var(--g)}
 
 /* STATUS */
-.stbar{padding:3px 12px;background:var(--panel);border-bottom:1px solid var(--border);font-family:'Share Tech Mono',monospace;font-size:7px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;min-height:20px}
-.stbar span{line-height:1}
+.stb{padding:3px 10px;background:var(--pn);border-bottom:1px solid var(--br);font-family:'Share Tech Mono',monospace;font-size:7px;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+#stlbl{transition:color .3s}
 
-/* SIGNAL BOX */
-.sg{padding:14px 12px;border-bottom:1px solid var(--border);display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:140px;position:relative;overflow:hidden;background:var(--panel)}
-.sg::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at center,var(--sg,transparent) 0%,transparent 65%);pointer-events:none;transition:background .6s}
-.sw2{text-align:center;z-index:1}
-.swi{font-size:26px;opacity:.3;animation:rot 8s linear infinite;display:block;margin-bottom:6px}
+/* SIGNAL */
+.sg{padding:12px 10px;border-bottom:1px solid var(--br);display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:130px;position:relative;overflow:hidden;background:var(--pn)}
+.sg::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at center,var(--sgg,transparent) 0%,transparent 65%);pointer-events:none;transition:background .5s}
+.swt2{text-align:center}
+.swi{font-size:24px;opacity:.25;display:block;margin-bottom:5px;animation:rot 8s linear infinite}
 @keyframes rot{to{transform:rotate(360deg)}}
-.swt{font-family:'Orbitron',monospace;font-size:7px;color:var(--dim);letter-spacing:3px}
-.sws{font-family:'Share Tech Mono',monospace;font-size:7px;color:var(--muted);margin-top:3px;letter-spacing:2px}
-.sdsp{display:none;flex-direction:column;align-items:center;gap:4px;width:100%;z-index:1}
+.swtx{font-family:'Orbitron',monospace;font-size:7px;color:var(--dm);letter-spacing:3px}
+.sws{font-family:'Share Tech Mono',monospace;font-size:6px;color:var(--mt);margin-top:3px;letter-spacing:2px}
+.sdsp{display:none;flex-direction:column;align-items:center;gap:4px;width:100%}
 .sty{font-family:'Orbitron',monospace;font-size:7px;letter-spacing:3px;font-weight:700}
-.sm{font-family:'Orbitron',monospace;font-size:20px;font-weight:900;letter-spacing:2px;text-align:center;animation:spp 1.2s ease-in-out infinite}
+.sm{font-family:'Orbitron',monospace;font-size:19px;font-weight:900;letter-spacing:2px;text-align:center;animation:spp 1.2s ease-in-out infinite}
 @keyframes spp{0%,100%{transform:scale(1)}50%{transform:scale(1.05)}}
-.sm.buy{color:var(--green);text-shadow:0 0 20px var(--green),0 0 40px rgba(0,255,136,.25)}
-.sm.sell{color:var(--red);text-shadow:0 0 20px var(--red),0 0 40px rgba(255,45,85,.25)}
-.sbw{width:90%;height:2px;background:var(--border);border-radius:1px;overflow:hidden;margin-top:3px}
+.sm.buy{color:var(--gr);text-shadow:0 0 20px var(--gr),0 0 40px rgba(0,255,136,.2)}
+.sm.sell{color:var(--rd);text-shadow:0 0 20px var(--rd),0 0 40px rgba(255,45,85,.2)}
+.sbw{width:88%;height:2px;background:var(--br);border-radius:1px;overflow:hidden;margin-top:2px}
 .sbf{height:100%;border-radius:1px;transition:width .5s}
-.sbf.buy{background:linear-gradient(90deg,var(--green-dim),var(--green))}.sbf.sell{background:linear-gradient(90deg,var(--red-dim),var(--red))}
-.sme{font-family:'Share Tech Mono',monospace;font-size:7px;color:var(--dim)}
-@keyframes fbu{0%,100%{box-shadow:inset 0 0 0 transparent}50%{box-shadow:inset 0 0 25px rgba(0,255,136,.12)}}
-@keyframes fse{0%,100%{box-shadow:inset 0 0 0 transparent}50%{box-shadow:inset 0 0 25px rgba(255,45,85,.12)}}
+.sbf.buy{background:linear-gradient(90deg,#00AA55,var(--gr))}.sbf.sell{background:linear-gradient(90deg,#AA1133,var(--rd))}
+.sme{font-family:'Share Tech Mono',monospace;font-size:7px;color:var(--dm)}
+@keyframes fbu{0%,100%{box-shadow:inset 0 0 0 transparent}50%{box-shadow:inset 0 0 30px rgba(0,255,136,.1)}}
+@keyframes fse{0%,100%{box-shadow:inset 0 0 0 transparent}50%{box-shadow:inset 0 0 30px rgba(255,45,85,.1)}}
 .fbu{animation:fbu .5s ease 4}.fse{animation:fse .5s ease 4}
 
 /* CONDITIONS */
-.sec{padding:10px 12px;border-bottom:1px solid var(--border)}
-.ptit{font-family:'Orbitron',monospace;font-size:7px;color:var(--gold);letter-spacing:3px;margin-bottom:8px;display:flex;align-items:center;gap:6px}
-.ptit::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,var(--gold-deep),transparent)}
-.ci{display:flex;align-items:center;gap:6px;padding:5px 0;border-bottom:1px solid var(--muted)}
+.sec{padding:9px 10px;border-bottom:1px solid var(--br)}
+.ptit{font-family:'Orbitron',monospace;font-size:6px;color:var(--g);letter-spacing:3px;margin-bottom:7px;display:flex;align-items:center;gap:5px}
+.ptit::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,var(--gd),transparent)}
+.ci{display:flex;align-items:center;gap:5px;padding:4px 0;border-bottom:1px solid var(--mt)}
 .ci:last-child{border-bottom:none}
-.cic{width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;flex-shrink:0;transition:all .3s;font-family:'Orbitron',monospace;font-weight:700}
-.cic.pass{background:var(--green-glow);border:1px solid var(--green);color:var(--green)}
-.cic.fail{background:var(--muted);border:1px solid var(--border);color:var(--dim)}
-.cic.warn{background:rgba(255,215,0,.08);border:1px solid var(--gold-deep);color:var(--gold)}
+.cic{width:17px;height:17px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:8px;flex-shrink:0;transition:.3s;font-family:'Orbitron',monospace;font-weight:700}
+.cic.pass{background:rgba(0,255,136,.12);border:1px solid var(--gr);color:var(--gr)}
+.cic.fail{background:var(--mt);border:1px solid var(--br);color:var(--dm)}
+.cic.warn{background:rgba(255,215,0,.08);border:1px solid var(--gd);color:var(--g)}
 .cinf{flex:1;min-width:0}
-.cn{font-family:'Rajdhani',sans-serif;font-size:10px;font-weight:600;color:var(--text);letter-spacing:.5px}
-.cd{font-family:'Share Tech Mono',monospace;font-size:7px;color:var(--dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px}
-.cs{font-family:'Share Tech Mono',monospace;font-size:6px;padding:1px 5px;border-radius:2px;flex-shrink:0;letter-spacing:1px}
-.cs.pass{color:var(--green);background:var(--green-glow)}.cs.fail{color:var(--dim);background:var(--muted)}.cs.warn{color:var(--gold);background:rgba(255,215,0,.08)}
+.cn{font-family:'Rajdhani',sans-serif;font-size:10px;font-weight:600;color:var(--tx)}
+.cd{font-family:'Share Tech Mono',monospace;font-size:7px;color:var(--dm);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cs{font-family:'Share Tech Mono',monospace;font-size:6px;padding:1px 4px;border-radius:2px;flex-shrink:0;letter-spacing:1px}
+.cs.pass{color:var(--gr);background:rgba(0,255,136,.1)}.cs.fail{color:var(--dm);background:var(--mt)}.cs.warn{color:var(--g);background:rgba(255,215,0,.08)}
 
 /* HISTORY */
-.hl{display:flex;flex-direction:column;gap:4px}
-.hi{display:flex;align-items:center;gap:5px;padding:5px 8px;background:var(--card);border:1px solid var(--border);border-radius:2px;border-left-width:3px}
-.hi.buy{border-left-color:var(--green)}.hi.sell{border-left-color:var(--red)}
-.hd{width:5px;height:5px;border-radius:50%;flex-shrink:0}
-.hd.buy{background:var(--green)}.hd.sell{background:var(--red)}
-.hinf2{flex:1;min-width:0}
-.ht2{font-family:'Orbitron',monospace;font-size:7px;font-weight:700}
-.ht2.buy{color:var(--green)}.ht2.sell{color:var(--red)}
-.htm{font-family:'Share Tech Mono',monospace;font-size:6px;color:var(--dim);margin-top:1px}
-.hpx2{font-family:'Share Tech Mono',monospace;font-size:8px;color:var(--text);flex-shrink:0}
+.hl{display:flex;flex-direction:column;gap:3px}
+.hi{display:flex;align-items:center;gap:5px;padding:4px 7px;background:var(--cd);border:1px solid var(--br);border-radius:2px;border-left-width:3px}
+.hi.buy{border-left-color:var(--gr)}.hi.sell{border-left-color:var(--rd)}
+.hd2{width:5px;height:5px;border-radius:50%;flex-shrink:0}
+.hd2.buy{background:var(--gr)}.hd2.sell{background:var(--rd)}
+.hinf{flex:1;min-width:0}
+.hty{font-family:'Orbitron',monospace;font-size:7px;font-weight:700}
+.hty.buy{color:var(--gr)}.hty.sell{color:var(--rd)}
+.htm{font-family:'Share Tech Mono',monospace;font-size:6px;color:var(--dm);margin-top:1px}
+.hpx{font-family:'Share Tech Mono',monospace;font-size:8px;color:var(--tx);flex-shrink:0}
 
 /* TICKER */
-.tk{background:var(--card);border-top:1px solid var(--border);padding:4px 0;overflow:hidden;font-family:'Share Tech Mono',monospace;font-size:8px;white-space:nowrap}
-.tki{display:inline-block;animation:tsc 35s linear infinite}
+.tk{background:var(--cd);border-top:1px solid var(--br);padding:3px 0;overflow:hidden;white-space:nowrap}
+.tki{display:inline-block;animation:tsc 40s linear infinite}
 @keyframes tsc{from{transform:translateX(0)}to{transform:translateX(-50%)}}
-.tit2{display:inline-block;margin:0 20px;color:var(--dim)}
-.tit2 .up{color:var(--green)}.tit2 .dn{color:var(--red)}
-.empty{font-family:'Share Tech Mono',monospace;font-size:7px;color:var(--muted);letter-spacing:2px;text-align:center;padding:12px 0}
-
-/* RETRY BTN */
-.retry-btn{display:none;background:linear-gradient(135deg,var(--gold),var(--gold-dim));color:#000;border:none;font-family:'Orbitron',monospace;font-size:9px;font-weight:700;letter-spacing:2px;padding:8px 20px;border-radius:3px;cursor:pointer;margin-top:8px}
-.retry-btn:hover{opacity:.85}
+.ti{display:inline-block;margin:0 18px;font-family:'Share Tech Mono',monospace;font-size:8px;color:var(--dm)}
+.ti .up{color:var(--gr)}.ti .dn{color:var(--rd)}
+.empty{font-family:'Share Tech Mono',monospace;font-size:7px;color:var(--mt);letter-spacing:2px;text-align:center;padding:10px 0}
 </style>
 </head>
 <body>
 
 <!-- HEADER -->
 <div class="hdr">
-  <div class="logo">
-    <div class="lhex"></div>
-    <div><div class="lt">APEX SIGNALS</div><div class="ls">TRIPLE CONFIRMATION v3.0</div></div>
-  </div>
+  <div class="lhex"></div>
+  <div><div class="lt">APEX SIGNALS</div><div class="ls">TRIPLE CONFIRMATION v3.0</div></div>
   <div class="psw">
     <button class="pb on" id="btn-btc" onclick="switchPair('BTC')">BTC/USDT</button>
     <button class="pb" id="btn-xau" onclick="switchPair('XAU')">XAU/USD</button>
   </div>
   <div class="hr">
-    <div class="li"><div class="dot warn" id="sdot"></div><span id="conn-lbl">INIT</span></div>
+    <div class="dot warn" id="sdot"></div>
+    <span id="clbl">INIT</span>
     <div class="clk" id="clk">--:--:--</div>
-    <button class="sb" id="sndbtn" onclick="toggleSnd()">🔔</button>
+    <button class="sndb" id="sndb" onclick="toggleSnd()">🔔</button>
   </div>
 </div>
 
-<!-- PRICE ROW -->
+<!-- PRICE -->
 <div class="pr">
-  <div><span class="cp" id="cprice">---.--</span><span class="pc up" id="pchg">+0.00%</span></div>
-  <div class="tw"><div class="tl">CANDLE CLOSE</div><div class="ct" id="ctimer">5:00</div></div>
+  <div><span class="cp" id="cpx">---.--</span><span class="pc up" id="pch">+0.00%</span></div>
+  <div class="tw"><div class="tl">CANDLE CLOSE</div><div class="ct" id="ctt">5:00</div></div>
 </div>
 
 <!-- CHART -->
-<div id="chart">
+<div id="ch">
   <div class="lo" id="lo">
-    <div class="ls2"></div>
-    <div class="ltx" id="ltx">LOADING MARKET DATA...</div>
-    <div class="src-info" id="src-info">Trying all available sources</div>
-    <button class="retry-btn" id="retry-btn" onclick="retryAll()">↺ RETRY</button>
+    <div class="sp"></div>
+    <div class="lmsg" id="lmsg">LOADING CHART...</div>
+    <div class="src" id="lsrc">Starting demo data instantly</div>
   </div>
+  <div class="badge" id="badge"></div>
 </div>
 
 <!-- INDICATORS -->
 <div class="ind">
   <div class="ib"><div class="il">EMA 9 / 21</div><div class="iv neu" id="iema">— / —</div></div>
   <div class="ib"><div class="il">RSI (14)</div><div class="iv neu" id="irsi">—</div></div>
-  <div class="ib"><div class="il">BOLLINGER B/U</div><div class="iv neu" id="ibb">— / —</div></div>
+  <div class="ib"><div class="il">BOLLINGER</div><div class="iv neu" id="ibb">— / —</div></div>
   <div class="ib"><div class="il">MACD HIST</div><div class="iv neu" id="imacd">—</div></div>
 </div>
 
-<!-- STATUS BAR -->
-<div class="stbar">
-  <span id="stlbl" style="color:var(--dim)">CONNECTING...</span>
-  <span style="color:var(--muted);margin-left:auto">5M CANDLES • TRIPLE CONFIRMATION</span>
+<!-- STATUS -->
+<div class="stb">
+  <div class="dot warn" id="stdt"></div>
+  <span id="stlbl" style="color:var(--dm)">INITIALIZING...</span>
+  <span style="color:var(--mt);margin-left:auto">5M • TRIPLE CONFIRMATION</span>
 </div>
 
 <!-- SIGNAL -->
-<div class="sg" id="sg">
-  <div class="sw2" id="sw2">
+<div class="sg" id="sgbox">
+  <div class="swt2" id="sw2">
     <span class="swi">◎</span>
-    <div class="swt">SCANNING MARKET</div>
+    <div class="swtx">SCANNING MARKET</div>
     <div class="sws">AWAITING TRIPLE CONFIRMATION</div>
   </div>
   <div class="sdsp" id="sdsp">
@@ -196,7 +197,7 @@ body::after{content:'';position:fixed;inset:0;background:repeating-linear-gradie
     <div class="sm buy" id="smtx">STRONG BUY</div>
     <div class="sbw"><div class="sbf buy" id="sbf" style="width:0%"></div></div>
     <div class="sme" id="spx">ENTRY: ---</div>
-    <div class="sme" id="stm2">TIME: ---</div>
+    <div class="sme" id="stm">TIME: ---</div>
   </div>
 </div>
 
@@ -218,139 +219,176 @@ body::after{content:'';position:fixed;inset:0;background:repeating-linear-gradie
 <!-- TICKER -->
 <div class="tk">
   <div class="tki" id="tkin">
-    <span class="tit2">BTC/USDT <span class="up">▲ --</span></span>
-    <span class="tit2">ETH/USDT <span class="up">▲ --</span></span>
-    <span class="tit2">BNB/USDT <span class="up">▲ --</span></span>
-    <span class="tit2">SOL/USDT <span class="up">▲ --</span></span>
-    <span class="tit2">XAU/USD <span class="up">◆ LIVE</span></span>
-    <span class="tit2">BTC/USDT <span class="up">▲ --</span></span>
-    <span class="tit2">ETH/USDT <span class="up">▲ --</span></span>
-    <span class="tit2">BNB/USDT <span class="up">▲ --</span></span>
-    <span class="tit2">SOL/USDT <span class="up">▲ --</span></span>
-    <span class="tit2">XAU/USD <span class="up">◆ LIVE</span></span>
+    <span class="ti">BTC/USDT <span class="up">▲ ---</span></span>
+    <span class="ti">ETH/USDT <span class="up">▲ ---</span></span>
+    <span class="ti">BNB/USDT <span class="up">▲ ---</span></span>
+    <span class="ti">SOL/USDT <span class="up">▲ ---</span></span>
+    <span class="ti">XAU/USD <span class="up">◆ LIVE</span></span>
+    <span class="ti">BTC/USDT <span class="up">▲ ---</span></span>
+    <span class="ti">ETH/USDT <span class="up">▲ ---</span></span>
+    <span class="ti">BNB/USDT <span class="up">▲ ---</span></span>
+    <span class="ti">SOL/USDT <span class="up">▲ ---</span></span>
+    <span class="ti">XAU/USD <span class="up">◆ LIVE</span></span>
   </div>
 </div>
 
 <script>
-// ═══════════════════════════════════════════════════════════════════
-//  APEX SIGNALS — Multi-Source Architecture
-//  Sources tried in order (all CORS-free or proxied):
-//  1. Binance WebSocket  (wss:// — no CORS)
-//  2. Kraken WebSocket   (wss:// — no CORS, different provider)
-//  3. CoinGecko REST     (CORS headers enabled by CoinGecko)
-//  4. Bybit REST         (CORS headers enabled)
-//  5. OKX REST           (CORS headers enabled)
-//  6. Synthetic Demo     (generated data — always works)
-// ═══════════════════════════════════════════════════════════════════
-
 'use strict';
 
-// ── STATE ───────────────────────────────────────────────────────
+// ═══════════════════════════════════════════
+//  STRATEGY: DEMO DATA LOADS INSTANTLY (t=0)
+//  Real data fetched silently in background.
+//  If real data arrives → chart upgrades live.
+//  Chart NEVER stays blank.
+// ═══════════════════════════════════════════
+
+const $ = id => document.getElementById(id);
+const ph = n => String(n).padStart(2,'0');
+
+// ── STATE ──────────────────────────────────
 let PAIR = 'BTC';
 let candles = [];
-let chart = null, cSer = null, e9Ser = null, e21Ser = null, bbUSer = null, bbLSer = null;
-let ws1 = null, ws2 = null;
+let chart = null, cS, e9S, e21S, bbUS, bbLS;
 let sndOn = true;
 let lastSigKey = null;
 let openPx = null;
 let sigHist = [];
-let chartReady = false;
-let dataSource = 'none';
-let retryCount = 0;
-let updateTimer = null;
-let goldPrice = 3280; // approximate XAU/USD
+let isLive = false;
+let liveTimer = null;
+let demoTimer = null;
+let demoPrice = 0;
+let lastRender = 0;
 
-// ── HELPERS ──────────────────────────────────────────────────────
-const ph = n => String(n).padStart(2,'0');
-const $ = id => document.getElementById(id);
+// Real BTC/XAU base prices (approximate)
+const BASE = { BTC: 84000, XAU: 3280 };
 
+// ── HELPERS ────────────────────────────────
 function fmtPx(p) {
   if (p == null || isNaN(p)) return '---';
   if (p > 10000) return p.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
   if (p > 100)   return p.toFixed(2);
   return p.toFixed(4);
 }
-
-function setDot(type) {
-  $('sdot').className = `dot ${type}`;
-}
+function setDot(id, type) { $(id).className = `dot ${type}`; }
 function setConn(msg, type='warn') {
-  setDot(type);
-  $('conn-lbl').textContent = msg;
-  $('conn-lbl').style.color = type==='ok' ? 'var(--green)' : type==='err' ? 'var(--red)' : 'var(--gold)';
+  setDot('sdot', type);
+  $('clbl').textContent = msg;
+  $('clbl').style.color = type==='ok'||type==='live' ? 'var(--gr)' : type==='err' ? 'var(--rd)' : 'var(--g)';
 }
-function setStatus(msg, type='warn') {
-  const e = $('stlbl');
-  e.textContent = msg;
-  e.style.color = type==='ok' ? 'var(--green)' : type==='err' ? 'var(--red)' : 'var(--gold)';
+function setStat(msg, type='warn') {
+  setDot('stdt', type);
+  const e=$('stlbl'); e.textContent=msg;
+  e.style.color = type==='ok'||type==='live' ? 'var(--gr)' : type==='err' ? 'var(--rd)' : 'var(--g)';
 }
-function setLtx(t, src='') {
-  $('ltx').innerHTML = t.replace(/\n/g,'<br>');
-  $('src-info').textContent = src;
+function setBadge(msg, type) {
+  const b=$('badge'); b.textContent=msg; b.className=`badge show ${type}`;
 }
-function showRetry() { $('retry-btn').style.display = 'block'; }
-function hideRetry() { $('retry-btn').style.display = 'none'; }
 function hideLoader() {
-  const lo = $('lo');
-  lo.style.opacity = '0';
-  setTimeout(() => { lo.style.display = 'none'; }, 300);
+  const lo=$('lo'); lo.classList.add('hide');
+  setTimeout(()=>lo.style.display='none', 400);
+}
+function showLoader(msg='', src='') {
+  const lo=$('lo');
+  lo.style.display='flex'; lo.classList.remove('hide');
+  if(msg) $('lmsg').textContent=msg;
+  if(src) $('lsrc').textContent=src;
 }
 
-// ── CLOCK ────────────────────────────────────────────────────────
+// ── CLOCK ──────────────────────────────────
 setInterval(() => {
-  const n = new Date();
-  $('clk').textContent = `${ph(n.getUTCHours())}:${ph(n.getUTCMinutes())}:${ph(n.getUTCSeconds())}`;
-}, 1000);
-
+  const n=new Date();
+  $('clk').textContent=`${ph(n.getUTCHours())}:${ph(n.getUTCMinutes())}:${ph(n.getUTCSeconds())}`;
+},1000);
 setInterval(() => {
-  const n = new Date();
-  const elapsed = (n.getUTCMinutes() % 5) * 60 + n.getUTCSeconds();
-  const rem = 300 - elapsed;
-  const el = $('ctimer');
-  el.textContent = `${Math.floor(rem/60)}:${ph(rem%60)}`;
-  el.classList.toggle('urg', rem <= 15);
-}, 1000);
+  const n=new Date();
+  const el=(n.getUTCMinutes()%5)*60+n.getUTCSeconds();
+  const rem=300-el;
+  const e=$('ctt'); e.textContent=`${Math.floor(rem/60)}:${ph(rem%60)}`;
+  e.classList.toggle('urg',rem<=15);
+},1000);
 
-// ── AUDIO ────────────────────────────────────────────────────────
+// ── AUDIO ──────────────────────────────────
 function ding() {
-  if (!sndOn) return;
-  try {
-    const ctx = new (window.AudioContext || window.webkitAudioContext)();
-    const o = ctx.createOscillator(), g = ctx.createGain();
-    o.connect(g); g.connect(ctx.destination);
-    o.type = 'sine';
-    o.frequency.setValueAtTime(880, ctx.currentTime);
-    o.frequency.exponentialRampToValueAtTime(440, ctx.currentTime + 0.3);
-    g.gain.setValueAtTime(0.3, ctx.currentTime);
-    g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.5);
-    o.start(); o.stop(ctx.currentTime + 0.5);
-  } catch(e) {}
+  if(!sndOn) return;
+  try{
+    const c=new(window.AudioContext||window.webkitAudioContext)();
+    const o=c.createOscillator(),g=c.createGain();
+    o.connect(g);g.connect(c.destination);
+    o.type='sine';
+    o.frequency.setValueAtTime(880,c.currentTime);
+    o.frequency.exponentialRampToValueAtTime(440,c.currentTime+.3);
+    g.gain.setValueAtTime(.3,c.currentTime);
+    g.gain.exponentialRampToValueAtTime(.001,c.currentTime+.5);
+    o.start();o.stop(c.currentTime+.5);
+  }catch(e){}
 }
-function toggleSnd() { sndOn = !sndOn; $('sndbtn').textContent = sndOn ? '🔔' : '🔕'; }
+function toggleSnd(){sndOn=!sndOn;$('sndb').textContent=sndOn?'🔔':'🔕';}
 
-// ── PAIR SWITCH ──────────────────────────────────────────────────
+// ── PAIR SWITCH ────────────────────────────
 function switchPair(p) {
-  if (p === PAIR) return;
-  PAIR = p;
-  $('btn-btc').classList.toggle('on', p === 'BTC');
-  $('btn-xau').classList.toggle('on', p === 'XAU');
-  candles = []; lastSigKey = null; openPx = null; chartReady = false;
-  $('cprice').textContent = '---.--';
+  if(p===PAIR) return;
+  PAIR=p;
+  $('btn-btc').classList.toggle('on',p==='BTC');
+  $('btn-xau').classList.toggle('on',p==='XAU');
+  candles=[]; lastSigKey=null; openPx=null; isLive=false;
+  $('cpx').textContent='---.--';
   resetSig();
-  $('lo').style.display = 'flex';
-  $('lo').style.opacity = '1';
-  hideRetry();
-  setLtx('SWITCHING PAIR...', '');
-  closeAllWS();
-  clearInterval(updateTimer);
-  if (chart) { chart.remove(); chart = null; }
+  clearInterval(liveTimer);
+  clearInterval(demoTimer);
+  if(chart){chart.remove();chart=null;}
   initChart();
-  startAll();
+  buildDemoInstant();       // Show chart RIGHT AWAY
+  tryRealDataBG();          // Try real data silently
 }
 
-// ── CHART INIT ───────────────────────────────────────────────────
-function initChart() {
-  const el = $('chart');
-  chart = LightweightCharts.createChart(el, {
-    width: el.clientWidth, height: el.clientHeight,
-    layout: { background: { color: '#07080D' }, textColor: '#4A4A6
+// ══════════════════════════════════════════════════════
+//  STEP 1: BUILD DEMO DATA INSTANTLY (synchronous)
+//  Chart appears immediately, no waiting, no loading
+// ══════════════════════════════════════════════════════
+function buildDemoInstant() {
+  const base  = BASE[PAIR];
+  const vol   = PAIR==='BTC' ? 600 : 18;
+  const now   = Math.floor(Date.now()/1000);
+  let price   = base;
+  let trend   = 0;
+  candles     = [];
+
+  for(let i=199; i>=0; i--) {
+    // Realistic random walk with drift
+    trend += (Math.random()-0.5)*0.3;
+    trend = Math.max(-1,Math.min(1,trend));
+    const move = (Math.random()-0.48+trend*0.1)*vol;
+    const o = price;
+    const c = Math.max(o+move, base*0.85);
+    const h = Math.max(o,c)+(Math.random()*vol*0.25);
+    const l = Math.min(o,c)-(Math.random()*vol*0.25);
+    const t = now - i*300;
+    candles.push({time:t-(t%300), open:o, high:h, low:l, close:c});
+    price = c;
+  }
+  openPx = candles[0].open;
+  demoPrice = candles[candles.length-1].close;
+
+  // Render immediately
+  renderChart();
+  analyzeSignals();
+  hideLoader();
+  setConn('DEMO','warn');
+  setStat('DEMO MODE — Trying live data in background...','warn');
+  setBadge('⚡ DEMO','demo');
+
+  // Animate demo candles
+  clearInterval(demoTimer);
+  demoTimer = setInterval(() => {
+    if(isLive) { clearInterval(demoTimer); return; }
+    const vol2 = PAIR==='BTC' ? 80 : 2.5;
+    const last = candles[candles.length-1];
+    const now2 = Math.floor(Date.now()/1000);
+    const nowSnap = now2 - (now2%300);
+    const move = (Math.random()-0.49)*vol2;
+    const newClose = Math.max(demoPrice+move, BASE[PAIR]*0.85);
+    demoPrice = newClose;
+    if(nowSnap === last.time) {
+      candles[candles.length-1] = {...last, close:newClose, high:Math.max(last.high,newClose), low:Math.min(last.low,newClose)};
+    } else {
+      candles.push({time:nowSnap, open:last.close, high:Math.max(last.close,newC
