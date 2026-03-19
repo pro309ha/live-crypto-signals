@@ -2,331 +2,355 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>APEX SIGNALS — Trading Terminal</title>
 <script src="https://unpkg.com/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&family=Rajdhani:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
-:root {
-  --gold:#FFD700;--gold-dim:#B8960C;--gold-glow:rgba(255,215,0,0.25);--gold-deep:#7A6000;
-  --bg:#020305;--panel:#08090F;--card:#0C0E18;--border:#1A1D2E;
-  --green:#00FF88;--green-dim:#00CC66;--green-glow:rgba(0,255,136,0.2);
-  --red:#FF2D55;--red-dim:#CC1133;--red-glow:rgba(255,45,85,0.2);
-  --text:#E8E8F0;--dim:#5A5A7A;--muted:#2A2A3A;
+:root{
+  --gold:#FFD700;--gold-dim:#B8960C;--gold-glow:rgba(255,215,0,0.2);--gold-deep:#6A5000;
+  --bg:#020305;--panel:#07080D;--card:#0B0D16;--border:#181B2A;
+  --green:#00FF88;--green-dim:#00AA55;--green-glow:rgba(0,255,136,0.15);
+  --red:#FF2D55;--red-dim:#AA1133;--red-glow:rgba(255,45,85,0.15);
+  --text:#DDDDF0;--dim:#4A4A6A;--muted:#1E1E2E;
 }
 *{margin:0;padding:0;box-sizing:border-box}
-html,body{width:100%;overflow-x:hidden;background:var(--bg);color:var(--text);font-family:'Rajdhani',sans-serif}
-body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.03) 2px,rgba(0,0,0,0.03) 4px);pointer-events:none;z-index:9999}
+html,body{width:100%;max-width:100vw;overflow-x:hidden;background:var(--bg);color:var(--text);font-family:'Rajdhani',sans-serif;-webkit-tap-highlight-color:transparent}
+body::after{content:'';position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(0,0,0,0.02) 3px,rgba(0,0,0,0.02) 4px);pointer-events:none;z-index:9000}
 
-.hdr{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:var(--panel);border-bottom:1px solid var(--border);position:relative;flex-wrap:wrap;gap:8px}
-.hdr::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent)}
-.logo{display:flex;align-items:center;gap:9px}
-.logo-hex{width:30px;height:30px;background:linear-gradient(135deg,var(--gold),var(--gold-dim));clip-path:polygon(50% 0%,100% 25%,100% 75%,50% 100%,0% 75%,0% 25%);animation:glow 3s ease-in-out infinite;flex-shrink:0}
-@keyframes glow{0%,100%{filter:drop-shadow(0 0 4px var(--gold))}50%{filter:drop-shadow(0 0 12px var(--gold))}}
-.logo-t{font-family:'Orbitron',monospace;font-size:13px;font-weight:900;color:var(--gold);letter-spacing:3px}
-.logo-s{font-family:'Share Tech Mono',monospace;font-size:7px;color:var(--dim);letter-spacing:2px;margin-top:2px}
-.pair-sw{display:flex;background:var(--card);border:1px solid var(--border);border-radius:4px;overflow:hidden}
-.pbtn{padding:6px 13px;background:transparent;border:none;color:var(--dim);font-family:'Orbitron',monospace;font-size:9px;font-weight:700;letter-spacing:2px;cursor:pointer;transition:all .3s}
-.pbtn.on{color:var(--bg);background:linear-gradient(135deg,var(--gold),var(--gold-dim));box-shadow:0 0 12px var(--gold-glow)}
-.pbtn:not(.on):hover{color:var(--gold)}
-.hdr-r{display:flex;align-items:center;gap:10px}
-.live-i{display:flex;align-items:center;gap:5px;font-family:'Share Tech Mono',monospace;font-size:8px;color:var(--green)}
-.dot{width:6px;height:6px;background:var(--green);border-radius:50%;box-shadow:0 0 6px var(--green);animation:blink 1.5s ease-in-out infinite}
-@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
-.clk{font-family:'Orbitron',monospace;font-size:11px;color:var(--gold)}
-.sndbtn{background:var(--card);border:1px solid var(--gold-deep);color:var(--gold);padding:4px 9px;border-radius:3px;cursor:pointer;font-family:'Share Tech Mono',monospace;font-size:9px}
+/* HEADER */
+.hdr{display:flex;align-items:center;padding:9px 12px;background:var(--panel);border-bottom:1px solid var(--border);position:relative;gap:8px;flex-wrap:wrap}
+.hdr::after{content:'';position:absolute;bottom:-1px;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent)}
+.logo{display:flex;align-items:center;gap:8px;flex-shrink:0}
+.lhex{width:28px;height:28px;background:linear-gradient(135deg,var(--gold),var(--gold-dim));clip-path:polygon(50% 0,100% 25%,100% 75%,50% 100%,0 75%,0 25%);flex-shrink:0;box-shadow:0 0 10px var(--gold-glow);animation:hpulse 3s ease-in-out infinite}
+@keyframes hpulse{0%,100%{box-shadow:0 0 8px var(--gold-glow)}50%{box-shadow:0 0 20px var(--gold-glow),0 0 40px rgba(255,215,0,0.08)}}
+.lt{font-family:'Orbitron',monospace;font-size:12px;font-weight:900;color:var(--gold);letter-spacing:3px;white-space:nowrap}
+.ls{font-family:'Share Tech Mono',monospace;font-size:7px;color:var(--dim);letter-spacing:2px;margin-top:1px}
+.psw{display:flex;background:var(--card);border:1px solid var(--border);border-radius:3px;overflow:hidden;margin-left:auto}
+.pb{padding:5px 12px;background:transparent;border:none;color:var(--dim);font-family:'Orbitron',monospace;font-size:8px;font-weight:700;letter-spacing:2px;cursor:pointer;transition:all .25s;white-space:nowrap}
+.pb.on{color:#000;background:linear-gradient(135deg,var(--gold),var(--gold-dim))}
+.pb:not(.on):hover{color:var(--gold)}
+.hr{display:flex;align-items:center;gap:8px;flex-shrink:0}
+.li{display:flex;align-items:center;gap:4px;font-family:'Share Tech Mono',monospace;font-size:8px}
+.dot{width:6px;height:6px;border-radius:50%;background:var(--dim);flex-shrink:0}
+.dot.ok{background:var(--green);box-shadow:0 0 6px var(--green);animation:blink 1.5s ease-in-out infinite}
+.dot.err{background:var(--red)}.dot.warn{background:var(--gold)}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.25}}
+#conn-lbl{font-family:'Share Tech Mono',monospace;font-size:8px;color:var(--dim)}
+.clk{font-family:'Orbitron',monospace;font-size:10px;color:var(--gold);letter-spacing:1px}
+.sb{background:var(--card);border:1px solid var(--gold-deep);color:var(--gold);padding:4px 8px;border-radius:3px;cursor:pointer;font-size:12px;line-height:1}
 
-.prow{display:flex;align-items:center;justify-content:space-between;padding:7px 14px;background:var(--panel);border-bottom:1px solid var(--border);flex-wrap:wrap;gap:6px}
-.cprice{font-family:'Orbitron',monospace;font-size:24px;font-weight:900;color:var(--gold);text-shadow:0 0 18px var(--gold-glow)}
-.pchg{font-family:'Share Tech Mono',monospace;font-size:11px;padding:2px 7px;border-radius:3px;margin-left:8px}
-.pchg.up{color:var(--green);background:rgba(0,255,136,.1)}.pchg.dn{color:var(--red);background:rgba(255,45,85,.1)}
-.tw{display:flex;align-items:center;gap:7px}
-.tlbl{font-family:'Share Tech Mono',monospace;font-size:8px;color:var(--dim);letter-spacing:2px}
-.ctimer{font-family:'Orbitron',monospace;font-size:18px;font-weight:700;color:var(--gold);padding:3px 10px;background:var(--card);border:1px solid var(--gold-deep);border-radius:4px;min-width:55px;text-align:center}
-.ctimer.urg{color:var(--red)!important;border-color:var(--red-dim)!important;animation:shk .3s ease infinite}
-@keyframes shk{0%,100%{transform:translateX(0)}25%{transform:translateX(-2px)}75%{transform:translateX(2px)}}
+/* PRICE ROW */
+.pr{display:flex;align-items:center;justify-content:space-between;padding:6px 12px;background:var(--panel);border-bottom:1px solid var(--border);flex-wrap:wrap;gap:4px}
+.cp{font-family:'Orbitron',monospace;font-size:22px;font-weight:900;color:var(--gold);text-shadow:0 0 15px var(--gold-glow);letter-spacing:.5px}
+.pc{font-family:'Share Tech Mono',monospace;font-size:10px;padding:2px 6px;border-radius:2px;margin-left:7px}
+.pc.up{color:var(--green);background:rgba(0,255,136,.08)}.pc.dn{color:var(--red);background:rgba(255,45,85,.08)}
+.tw{display:flex;align-items:center;gap:6px}
+.tl{font-family:'Share Tech Mono',monospace;font-size:7px;color:var(--dim);letter-spacing:2px}
+.ct{font-family:'Orbitron',monospace;font-size:17px;font-weight:700;color:var(--gold);padding:3px 9px;background:var(--card);border:1px solid var(--gold-deep);border-radius:3px;min-width:52px;text-align:center;transition:color .3s,border-color .3s}
+.ct.urg{color:var(--red)!important;border-color:var(--red-dim)!important;animation:shk .25s ease infinite}
+@keyframes shk{0%,100%{transform:translateX(0)}33%{transform:translateX(-1.5px)}66%{transform:translateX(1.5px)}}
 
-#chart{position:relative;width:100%;height:52vw;min-height:250px;max-height:400px}
-@media(min-width:600px){#chart{height:370px;max-height:440px}}
-.loverlay{position:absolute;inset:0;background:var(--card);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:10;gap:14px}
-.lspinner{width:40px;height:40px;border:2px solid var(--border);border-top-color:var(--gold);border-radius:50%;animation:spin 1s linear infinite}
+/* CHART */
+#chart{position:relative;width:100%;height:56vw;min-height:240px;max-height:380px}
+@media(min-width:550px){#chart{height:340px;max-height:420px}}
+.lo{position:absolute;inset:0;background:var(--card);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:10;gap:12px;transition:opacity .3s}
+.ls2{width:38px;height:38px;border:2px solid var(--border);border-top-color:var(--gold);border-radius:50%;animation:spin 1s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
-.ltxt{font-family:'Orbitron',monospace;font-size:8px;color:var(--dim);letter-spacing:3px;text-align:center;padding:0 20px;line-height:1.8}
+.ltx{font-family:'Orbitron',monospace;font-size:7px;color:var(--dim);letter-spacing:3px;text-align:center;padding:0 16px;line-height:2}
+.src-info{font-family:'Share Tech Mono',monospace;font-size:8px;color:var(--gold);text-align:center;padding:0 16px}
 
-.indr{display:grid;grid-template-columns:repeat(2,1fr);background:var(--border);gap:1px;border-top:1px solid var(--border)}
-@media(min-width:420px){.indr{grid-template-columns:repeat(4,1fr)}}
-.ibox{background:var(--card);padding:6px 11px}
-.ilbl{font-family:'Share Tech Mono',monospace;font-size:7px;color:var(--dim);letter-spacing:2px}
-.ival{font-family:'Orbitron',monospace;font-size:11px;font-weight:700}
-.ival.bull{color:var(--green)}.ival.bear{color:var(--red)}.ival.neu{color:var(--gold)}
+/* INDICATORS */
+.ind{display:grid;grid-template-columns:repeat(2,1fr);background:var(--border);gap:1px}
+@media(min-width:400px){.ind{grid-template-columns:repeat(4,1fr)}}
+.ib{background:var(--card);padding:5px 10px}
+.il{font-family:'Share Tech Mono',monospace;font-size:6px;color:var(--dim);letter-spacing:2px;margin-bottom:2px}
+.iv{font-family:'Orbitron',monospace;font-size:10px;font-weight:700;transition:color .3s}
+.iv.bull{color:var(--green)}.iv.bear{color:var(--red)}.iv.neu{color:var(--gold)}
 
-.sbar{padding:4px 14px;background:var(--panel);border-bottom:1px solid var(--border);font-family:'Share Tech Mono',monospace;font-size:8px;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
-.sbar-dot{width:5px;height:5px;border-radius:50%;flex-shrink:0}
-.sbar-dot.ok{background:var(--green)}.sbar-dot.err{background:var(--red)}.sbar-dot.warn{background:var(--gold)}
+/* STATUS */
+.stbar{padding:3px 12px;background:var(--panel);border-bottom:1px solid var(--border);font-family:'Share Tech Mono',monospace;font-size:7px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;min-height:20px}
+.stbar span{line-height:1}
 
-.sigbox{padding:16px 14px;border-bottom:1px solid var(--border);display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:150px;position:relative;overflow:hidden}
-.sigbox::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at center,var(--sg,transparent) 0%,transparent 70%);pointer-events:none;transition:all .5s}
-.sw{text-align:center}
-.swi{font-size:28px;opacity:.4;animation:rot 8s linear infinite}
-@keyframes rot{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
-.swt{font-family:'Orbitron',monospace;font-size:8px;color:var(--dim);letter-spacing:3px;margin-top:6px}
-.sws{font-family:'Share Tech Mono',monospace;font-size:7px;color:var(--muted);margin-top:4px;letter-spacing:2px}
-.sdsp{display:none;flex-direction:column;align-items:center;gap:5px;width:100%}
-.stype{font-family:'Orbitron',monospace;font-size:8px;letter-spacing:3px;font-weight:700}
-.smain{font-family:'Orbitron',monospace;font-size:22px;font-weight:900;letter-spacing:2px;text-align:center;animation:sp 1s ease-in-out infinite}
-@keyframes sp{0%,100%{transform:scale(1)}50%{transform:scale(1.04)}}
-.smain.buy{color:var(--green);text-shadow:0 0 25px var(--green),0 0 50px rgba(0,255,136,.3)}
-.smain.sell{color:var(--red);text-shadow:0 0 25px var(--red),0 0 50px rgba(255,45,85,.3)}
-.sbar-w{width:100%;height:3px;background:var(--border);border-radius:2px;overflow:hidden;margin-top:4px}
-.sbarf{height:100%;border-radius:2px;transition:width .5s}
-.sbarf.buy{background:linear-gradient(90deg,var(--green-dim),var(--green));box-shadow:0 0 8px var(--green)}
-.sbarf.sell{background:linear-gradient(90deg,var(--red-dim),var(--red));box-shadow:0 0 8px var(--red)}
-.smeta{font-family:'Share Tech Mono',monospace;font-size:8px;color:var(--dim)}
-@keyframes fb{0%,100%{box-shadow:inset 0 0 0px transparent}50%{box-shadow:inset 0 0 30px rgba(0,255,136,.15)}}
-@keyframes fs{0%,100%{box-shadow:inset 0 0 0px transparent}50%{box-shadow:inset 0 0 30px rgba(255,45,85,.15)}}
-.fb{animation:fb .6s ease 3}.fs{animation:fs .6s ease 3}
+/* SIGNAL BOX */
+.sg{padding:14px 12px;border-bottom:1px solid var(--border);display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:140px;position:relative;overflow:hidden;background:var(--panel)}
+.sg::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at center,var(--sg,transparent) 0%,transparent 65%);pointer-events:none;transition:background .6s}
+.sw2{text-align:center;z-index:1}
+.swi{font-size:26px;opacity:.3;animation:rot 8s linear infinite;display:block;margin-bottom:6px}
+@keyframes rot{to{transform:rotate(360deg)}}
+.swt{font-family:'Orbitron',monospace;font-size:7px;color:var(--dim);letter-spacing:3px}
+.sws{font-family:'Share Tech Mono',monospace;font-size:7px;color:var(--muted);margin-top:3px;letter-spacing:2px}
+.sdsp{display:none;flex-direction:column;align-items:center;gap:4px;width:100%;z-index:1}
+.sty{font-family:'Orbitron',monospace;font-size:7px;letter-spacing:3px;font-weight:700}
+.sm{font-family:'Orbitron',monospace;font-size:20px;font-weight:900;letter-spacing:2px;text-align:center;animation:spp 1.2s ease-in-out infinite}
+@keyframes spp{0%,100%{transform:scale(1)}50%{transform:scale(1.05)}}
+.sm.buy{color:var(--green);text-shadow:0 0 20px var(--green),0 0 40px rgba(0,255,136,.25)}
+.sm.sell{color:var(--red);text-shadow:0 0 20px var(--red),0 0 40px rgba(255,45,85,.25)}
+.sbw{width:90%;height:2px;background:var(--border);border-radius:1px;overflow:hidden;margin-top:3px}
+.sbf{height:100%;border-radius:1px;transition:width .5s}
+.sbf.buy{background:linear-gradient(90deg,var(--green-dim),var(--green))}.sbf.sell{background:linear-gradient(90deg,var(--red-dim),var(--red))}
+.sme{font-family:'Share Tech Mono',monospace;font-size:7px;color:var(--dim)}
+@keyframes fbu{0%,100%{box-shadow:inset 0 0 0 transparent}50%{box-shadow:inset 0 0 25px rgba(0,255,136,.12)}}
+@keyframes fse{0%,100%{box-shadow:inset 0 0 0 transparent}50%{box-shadow:inset 0 0 25px rgba(255,45,85,.12)}}
+.fbu{animation:fbu .5s ease 4}.fse{animation:fse .5s ease 4}
 
-.psec{padding:11px 14px;border-bottom:1px solid var(--border)}
-.ptit{font-family:'Orbitron',monospace;font-size:7px;color:var(--gold);letter-spacing:3px;margin-bottom:9px;display:flex;align-items:center;gap:7px}
+/* CONDITIONS */
+.sec{padding:10px 12px;border-bottom:1px solid var(--border)}
+.ptit{font-family:'Orbitron',monospace;font-size:7px;color:var(--gold);letter-spacing:3px;margin-bottom:8px;display:flex;align-items:center;gap:6px}
 .ptit::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,var(--gold-deep),transparent)}
-.ci{display:flex;align-items:center;gap:7px;padding:6px 0;border-bottom:1px solid var(--muted)}
+.ci{display:flex;align-items:center;gap:6px;padding:5px 0;border-bottom:1px solid var(--muted)}
 .ci:last-child{border-bottom:none}
-.cico{width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;flex-shrink:0;transition:all .3s}
-.cico.pass{background:var(--green-glow);border:1px solid var(--green);color:var(--green)}
-.cico.fail{background:var(--muted);border:1px solid var(--border);color:var(--dim)}
-.cico.warn{background:rgba(255,215,0,.1);border:1px solid var(--gold-deep);color:var(--gold)}
+.cic{width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;flex-shrink:0;transition:all .3s;font-family:'Orbitron',monospace;font-weight:700}
+.cic.pass{background:var(--green-glow);border:1px solid var(--green);color:var(--green)}
+.cic.fail{background:var(--muted);border:1px solid var(--border);color:var(--dim)}
+.cic.warn{background:rgba(255,215,0,.08);border:1px solid var(--gold-deep);color:var(--gold)}
 .cinf{flex:1;min-width:0}
-.cnm{font-family:'Rajdhani',sans-serif;font-size:11px;font-weight:600;color:var(--text)}
-.cdt{font-family:'Share Tech Mono',monospace;font-size:8px;color:var(--dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.cst{font-family:'Share Tech Mono',monospace;font-size:7px;padding:2px 5px;border-radius:3px;flex-shrink:0}
-.cst.pass{color:var(--green);background:var(--green-glow)}.cst.fail{color:var(--dim);background:var(--muted)}.cst.warn{color:var(--gold);background:rgba(255,215,0,.1)}
+.cn{font-family:'Rajdhani',sans-serif;font-size:10px;font-weight:600;color:var(--text);letter-spacing:.5px}
+.cd{font-family:'Share Tech Mono',monospace;font-size:7px;color:var(--dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px}
+.cs{font-family:'Share Tech Mono',monospace;font-size:6px;padding:1px 5px;border-radius:2px;flex-shrink:0;letter-spacing:1px}
+.cs.pass{color:var(--green);background:var(--green-glow)}.cs.fail{color:var(--dim);background:var(--muted)}.cs.warn{color:var(--gold);background:rgba(255,215,0,.08)}
 
-.hlist{display:flex;flex-direction:column;gap:4px}
-.hit{display:flex;align-items:center;gap:6px;padding:6px 9px;background:var(--card);border:1px solid var(--border);border-radius:3px;border-left-width:3px}
-.hit.buy{border-left-color:var(--green)}.hit.sell{border-left-color:var(--red)}
-.hdot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
-.hdot.buy{background:var(--green)}.hdot.sell{background:var(--red)}
-.hinf{flex:1;min-width:0}
-.htyp{font-family:'Orbitron',monospace;font-size:8px;font-weight:700}
-.htyp.buy{color:var(--green)}.htyp.sell{color:var(--red)}
-.htm{font-family:'Share Tech Mono',monospace;font-size:7px;color:var(--dim)}
-.hpx{font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--text);flex-shrink:0}
+/* HISTORY */
+.hl{display:flex;flex-direction:column;gap:4px}
+.hi{display:flex;align-items:center;gap:5px;padding:5px 8px;background:var(--card);border:1px solid var(--border);border-radius:2px;border-left-width:3px}
+.hi.buy{border-left-color:var(--green)}.hi.sell{border-left-color:var(--red)}
+.hd{width:5px;height:5px;border-radius:50%;flex-shrink:0}
+.hd.buy{background:var(--green)}.hd.sell{background:var(--red)}
+.hinf2{flex:1;min-width:0}
+.ht2{font-family:'Orbitron',monospace;font-size:7px;font-weight:700}
+.ht2.buy{color:var(--green)}.ht2.sell{color:var(--red)}
+.htm{font-family:'Share Tech Mono',monospace;font-size:6px;color:var(--dim);margin-top:1px}
+.hpx2{font-family:'Share Tech Mono',monospace;font-size:8px;color:var(--text);flex-shrink:0}
 
-.ticker{background:var(--card);border-top:1px solid var(--border);padding:5px 0;overflow:hidden;font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--dim);white-space:nowrap}
-.tinn{display:inline-block;animation:tsc 30s linear infinite}
+/* TICKER */
+.tk{background:var(--card);border-top:1px solid var(--border);padding:4px 0;overflow:hidden;font-family:'Share Tech Mono',monospace;font-size:8px;white-space:nowrap}
+.tki{display:inline-block;animation:tsc 35s linear infinite}
 @keyframes tsc{from{transform:translateX(0)}to{transform:translateX(-50%)}}
-.tit{display:inline-block;margin:0 25px}
-.tit .up{color:var(--green)}.tit .dn{color:var(--red)}
-.empty{font-family:'Share Tech Mono',monospace;font-size:8px;color:var(--muted);letter-spacing:2px;text-align:center;padding:14px 0}
+.tit2{display:inline-block;margin:0 20px;color:var(--dim)}
+.tit2 .up{color:var(--green)}.tit2 .dn{color:var(--red)}
+.empty{font-family:'Share Tech Mono',monospace;font-size:7px;color:var(--muted);letter-spacing:2px;text-align:center;padding:12px 0}
+
+/* RETRY BTN */
+.retry-btn{display:none;background:linear-gradient(135deg,var(--gold),var(--gold-dim));color:#000;border:none;font-family:'Orbitron',monospace;font-size:9px;font-weight:700;letter-spacing:2px;padding:8px 20px;border-radius:3px;cursor:pointer;margin-top:8px}
+.retry-btn:hover{opacity:.85}
 </style>
 </head>
 <body>
 
+<!-- HEADER -->
 <div class="hdr">
   <div class="logo">
-    <div class="logo-hex"></div>
-    <div><div class="logo-t">APEX SIGNALS</div><div class="logo-s">TRIPLE CONFIRMATION ENGINE v3.0</div></div>
+    <div class="lhex"></div>
+    <div><div class="lt">APEX SIGNALS</div><div class="ls">TRIPLE CONFIRMATION v3.0</div></div>
   </div>
-  <div class="pair-sw">
-    <button class="pbtn on" id="btn-btc" onclick="switchPair('BTC')">BTC/USDT</button>
-    <button class="pbtn" id="btn-xau" onclick="switchPair('XAU')">XAU/USD</button>
+  <div class="psw">
+    <button class="pb on" id="btn-btc" onclick="switchPair('BTC')">BTC/USDT</button>
+    <button class="pb" id="btn-xau" onclick="switchPair('XAU')">XAU/USD</button>
   </div>
-  <div class="hdr-r">
-    <div class="live-i"><div class="dot"></div><span id="conn-lbl">CONNECTING</span></div>
+  <div class="hr">
+    <div class="li"><div class="dot warn" id="sdot"></div><span id="conn-lbl">INIT</span></div>
     <div class="clk" id="clk">--:--:--</div>
-    <button class="sndbtn" id="sndbtn" onclick="toggleSnd()">🔔</button>
+    <button class="sb" id="sndbtn" onclick="toggleSnd()">🔔</button>
   </div>
 </div>
 
-<div class="prow">
-  <div><span class="cprice" id="cprice">---.--</span><span class="pchg up" id="pchg">+0.00%</span></div>
-  <div class="tw"><div class="tlbl">CANDLE CLOSE</div><div class="ctimer" id="ctimer">5:00</div></div>
+<!-- PRICE ROW -->
+<div class="pr">
+  <div><span class="cp" id="cprice">---.--</span><span class="pc up" id="pchg">+0.00%</span></div>
+  <div class="tw"><div class="tl">CANDLE CLOSE</div><div class="ct" id="ctimer">5:00</div></div>
 </div>
 
+<!-- CHART -->
 <div id="chart">
-  <div class="loverlay" id="loverlay">
-    <div class="lspinner"></div>
-    <div class="ltxt" id="ltxt">CONNECTING VIA WEBSOCKET...<br>NO CORS RESTRICTIONS</div>
+  <div class="lo" id="lo">
+    <div class="ls2"></div>
+    <div class="ltx" id="ltx">LOADING MARKET DATA...</div>
+    <div class="src-info" id="src-info">Trying all available sources</div>
+    <button class="retry-btn" id="retry-btn" onclick="retryAll()">↺ RETRY</button>
   </div>
 </div>
 
-<div class="indr">
-  <div class="ibox"><div class="ilbl">EMA 9 / 21</div><div class="ival neu" id="iema">— / —</div></div>
-  <div class="ibox"><div class="ilbl">RSI (14)</div><div class="ival neu" id="irsi">—</div></div>
-  <div class="ibox"><div class="ilbl">BOLLINGER</div><div class="ival neu" id="ibb">— / —</div></div>
-  <div class="ibox"><div class="ilbl">MACD HIST</div><div class="ival neu" id="imacd">—</div></div>
+<!-- INDICATORS -->
+<div class="ind">
+  <div class="ib"><div class="il">EMA 9 / 21</div><div class="iv neu" id="iema">— / —</div></div>
+  <div class="ib"><div class="il">RSI (14)</div><div class="iv neu" id="irsi">—</div></div>
+  <div class="ib"><div class="il">BOLLINGER B/U</div><div class="iv neu" id="ibb">— / —</div></div>
+  <div class="ib"><div class="il">MACD HIST</div><div class="iv neu" id="imacd">—</div></div>
 </div>
 
-<div class="sbar">
-  <div class="sbar-dot warn" id="sdot"></div>
-  <span id="slbl" style="color:var(--dim)">INITIALIZING...</span>
-  <span style="color:var(--muted);margin-left:auto">5M • TRIPLE CONFIRMATION</span>
+<!-- STATUS BAR -->
+<div class="stbar">
+  <span id="stlbl" style="color:var(--dim)">CONNECTING...</span>
+  <span style="color:var(--muted);margin-left:auto">5M CANDLES • TRIPLE CONFIRMATION</span>
 </div>
 
-<div class="sigbox" id="sigbox">
-  <div class="sw" id="sw">
-    <div class="swi">◎</div>
+<!-- SIGNAL -->
+<div class="sg" id="sg">
+  <div class="sw2" id="sw2">
+    <span class="swi">◎</span>
     <div class="swt">SCANNING MARKET</div>
     <div class="sws">AWAITING TRIPLE CONFIRMATION</div>
   </div>
   <div class="sdsp" id="sdsp">
-    <div class="stype" id="stype">TRIPLE CONFIRMED</div>
-    <div class="smain buy" id="smain">STRONG BUY</div>
-    <div class="sbar-w"><div class="sbarf buy" id="sbarf" style="width:0%"></div></div>
-    <div class="smeta" id="spx">ENTRY: ---</div>
-    <div class="smeta" id="stm">TIME: ---</div>
+    <div class="sty" id="sty">TRIPLE CONFIRMED</div>
+    <div class="sm buy" id="smtx">STRONG BUY</div>
+    <div class="sbw"><div class="sbf buy" id="sbf" style="width:0%"></div></div>
+    <div class="sme" id="spx">ENTRY: ---</div>
+    <div class="sme" id="stm2">TIME: ---</div>
   </div>
 </div>
 
-<div class="psec">
+<!-- CONDITIONS -->
+<div class="sec">
   <div class="ptit">TRIPLE CONFIRMATION STATUS</div>
-  <div class="ci"><div class="cico fail" id="c1i">1</div><div class="cinf"><div class="cnm">TREND — EMA 9/21</div><div class="cdt" id="c1d">EMA9 vs EMA21 alignment</div></div><div class="cst fail" id="c1s">WAIT</div></div>
-  <div class="ci"><div class="cico fail" id="c2i">2</div><div class="cinf"><div class="cnm">MOMENTUM — RSI(14)</div><div class="cdt" id="c2d">Oversold &lt;35 / Overbought &gt;65</div></div><div class="cst fail" id="c2s">WAIT</div></div>
-  <div class="ci"><div class="cico fail" id="c3i">3</div><div class="cinf"><div class="cnm">VOLATILITY — BOLLINGER</div><div class="cdt" id="c3d">Price vs Band touch</div></div><div class="cst fail" id="c3s">WAIT</div></div>
-  <div class="ci"><div class="cico fail" id="c4i">★</div><div class="cinf"><div class="cnm">EXTRA — MACD FLIP</div><div class="cdt" id="c4d">Histogram direction change</div></div><div class="cst fail" id="c4s">WAIT</div></div>
+  <div class="ci"><div class="cic fail" id="c1i">1</div><div class="cinf"><div class="cn">TREND — EMA 9/21</div><div class="cd" id="c1d">EMA9 vs EMA21 alignment</div></div><div class="cs fail" id="c1s">WAIT</div></div>
+  <div class="ci"><div class="cic fail" id="c2i">2</div><div class="cinf"><div class="cn">MOMENTUM — RSI(14)</div><div class="cd" id="c2d">Oversold &lt;35 / Overbought &gt;65</div></div><div class="cs fail" id="c2s">WAIT</div></div>
+  <div class="ci"><div class="cic fail" id="c3i">3</div><div class="cinf"><div class="cn">VOLATILITY — BOLLINGER</div><div class="cd" id="c3d">Price vs Band touch</div></div><div class="cs fail" id="c3s">WAIT</div></div>
+  <div class="ci"><div class="cic fail" id="c4i">★</div><div class="cinf"><div class="cn">EXTRA — MACD FLIP</div><div class="cd" id="c4d">Histogram direction change</div></div><div class="cs fail" id="c4s">WAIT</div></div>
 </div>
 
-<div class="psec">
+<!-- HISTORY -->
+<div class="sec">
   <div class="ptit">SIGNAL LOG</div>
-  <div class="hlist" id="hlist"><div class="empty">NO SIGNALS YET</div></div>
+  <div class="hl" id="hlist"><div class="empty">NO SIGNALS YET</div></div>
 </div>
 
-<div class="ticker">
-  <div class="tinn" id="tinn">
-    <span class="tit">BTC/USDT <span class="up">▲ Live</span></span><span class="tit">ETH/USDT <span class="up">▲ Live</span></span>
-    <span class="tit">BNB/USDT <span class="up">▲ Live</span></span><span class="tit">SOL/USDT <span class="up">▲ Live</span></span>
-    <span class="tit">XAU/USD <span class="up">◆ Live</span></span>
-    <span class="tit">BTC/USDT <span class="up">▲ Live</span></span><span class="tit">ETH/USDT <span class="up">▲ Live</span></span>
-    <span class="tit">BNB/USDT <span class="up">▲ Live</span></span><span class="tit">SOL/USDT <span class="up">▲ Live</span></span>
-    <span class="tit">XAU/USD <span class="up">◆ Live</span></span>
+<!-- TICKER -->
+<div class="tk">
+  <div class="tki" id="tkin">
+    <span class="tit2">BTC/USDT <span class="up">▲ --</span></span>
+    <span class="tit2">ETH/USDT <span class="up">▲ --</span></span>
+    <span class="tit2">BNB/USDT <span class="up">▲ --</span></span>
+    <span class="tit2">SOL/USDT <span class="up">▲ --</span></span>
+    <span class="tit2">XAU/USD <span class="up">◆ LIVE</span></span>
+    <span class="tit2">BTC/USDT <span class="up">▲ --</span></span>
+    <span class="tit2">ETH/USDT <span class="up">▲ --</span></span>
+    <span class="tit2">BNB/USDT <span class="up">▲ --</span></span>
+    <span class="tit2">SOL/USDT <span class="up">▲ --</span></span>
+    <span class="tit2">XAU/USD <span class="up">◆ LIVE</span></span>
   </div>
 </div>
 
 <script>
-// ═══════════════════════════════════════════════════════════════
-// APEX SIGNALS — WebSocket-First Architecture
-// WebSocket does NOT have CORS restrictions — works on ALL hosts
-// including GitHub Pages, Netlify, Vercel, etc.
-// ═══════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════════
+//  APEX SIGNALS — Multi-Source Architecture
+//  Sources tried in order (all CORS-free or proxied):
+//  1. Binance WebSocket  (wss:// — no CORS)
+//  2. Kraken WebSocket   (wss:// — no CORS, different provider)
+//  3. CoinGecko REST     (CORS headers enabled by CoinGecko)
+//  4. Bybit REST         (CORS headers enabled)
+//  5. OKX REST           (CORS headers enabled)
+//  6. Synthetic Demo     (generated data — always works)
+// ═══════════════════════════════════════════════════════════════════
 
+'use strict';
+
+// ── STATE ───────────────────────────────────────────────────────
 let PAIR = 'BTC';
 let candles = [];
-let chart=null,cS=null,e9S=null,e21S=null,bbUS=null,bbLS=null;
-let ws=null, wsPing=null;
-let sndOn=true;
-let lastSigKey=null;
-let openPx=null;
-let sigHist=[];
-let candlesReady=false;
+let chart = null, cSer = null, e9Ser = null, e21Ser = null, bbUSer = null, bbLSer = null;
+let ws1 = null, ws2 = null;
+let sndOn = true;
+let lastSigKey = null;
+let openPx = null;
+let sigHist = [];
+let chartReady = false;
+let dataSource = 'none';
+let retryCount = 0;
+let updateTimer = null;
+let goldPrice = 3280; // approximate XAU/USD
 
-// ── AUDIO ──────────────────────────────────────────────────────
-function ding(){
-  if(!sndOn)return;
-  try{
-    const c=new(window.AudioContext||window.webkitAudioContext)();
-    const o=c.createOscillator(),g=c.createGain();
-    o.connect(g);g.connect(c.destination);
-    o.type='sine';
-    o.frequency.setValueAtTime(880,c.currentTime);
-    o.frequency.exponentialRampToValueAtTime(440,c.currentTime+.3);
-    g.gain.setValueAtTime(.3,c.currentTime);
-    g.gain.exponentialRampToValueAtTime(.001,c.currentTime+.5);
-    o.start();o.stop(c.currentTime+.5);
-  }catch(e){}
-}
-function toggleSnd(){sndOn=!sndOn;document.getElementById('sndbtn').textContent=sndOn?'🔔':'🔕';}
+// ── HELPERS ──────────────────────────────────────────────────────
+const ph = n => String(n).padStart(2,'0');
+const $ = id => document.getElementById(id);
 
-// ── CLOCK ──────────────────────────────────────────────────────
-setInterval(()=>{
-  const n=new Date();
-  document.getElementById('clk').textContent=`${ph(n.getUTCHours())}:${ph(n.getUTCMinutes())}:${ph(n.getUTCSeconds())}`;
-},1000);
-setInterval(()=>{
-  const n=new Date();
-  const el=(n.getUTCMinutes()%5)*60+n.getUTCSeconds();
-  const rem=300-el; const m=Math.floor(rem/60),s=rem%60;
-  const e=document.getElementById('ctimer');
-  e.textContent=`${m}:${ph(s)}`;
-  e.classList.toggle('urg',rem<=15);
-},1000);
-function ph(n){return String(n).padStart(2,'0');}
-
-// ── PAIR SWITCH ────────────────────────────────────────────────
-function switchPair(p){
-  if(p===PAIR)return;
-  PAIR=p;
-  document.getElementById('btn-btc').classList.toggle('on',p==='BTC');
-  document.getElementById('btn-xau').classList.toggle('on',p==='XAU');
-  candles=[];lastSigKey=null;openPx=null;candlesReady=false;
-  document.getElementById('cprice').textContent='---.--';
-  resetSig();
-  document.getElementById('loverlay').style.display='flex';
-  setLtxt('SWITCHING TO '+(p==='BTC'?'BTC/USDT':'XAU/USD')+'...');
-  closeWS();
-  if(chart){chart.remove();chart=null;}
-  initChart();
-  startWS();
+function fmtPx(p) {
+  if (p == null || isNaN(p)) return '---';
+  if (p > 10000) return p.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+  if (p > 100)   return p.toFixed(2);
+  return p.toFixed(4);
 }
 
-// ── CHART ──────────────────────────────────────────────────────
-function initChart(){
-  const el=document.getElementById('chart');
-  chart=LightweightCharts.createChart(el,{
-    width:el.clientWidth,height:el.clientHeight,
-    layout:{background:{color:'#08090F'},textColor:'#5A5A7A'},
-    grid:{vertLines:{color:'#0E1020'},horzLines:{color:'#0E1020'}},
-    crosshair:{mode:LightweightCharts.CrosshairMode.Normal,vertLine:{color:'#FFD70040'},horzLine:{color:'#FFD70040'}},
-    rightPriceScale:{borderColor:'#1A1D2E',textColor:'#5A5A7A'},
-    timeScale:{borderColor:'#1A1D2E',textColor:'#5A5A7A',timeVisible:true,secondsVisible:false},
-  });
-  cS=chart.addCandlestickSeries({upColor:'#00FF88',downColor:'#FF2D55',borderUpColor:'#00FF88',borderDownColor:'#FF2D55',wickUpColor:'#00FF88',wickDownColor:'#FF2D55'});
-  e9S=chart.addLineSeries({color:'#FFD700',lineWidth:1,priceLineVisible:false,lastValueVisible:false});
-  e21S=chart.addLineSeries({color:'#4A9EFF',lineWidth:1,priceLineVisible:false,lastValueVisible:false});
-  bbUS=chart.addLineSeries({color:'rgba(255,215,0,.3)',lineWidth:1,lineStyle:2,priceLineVisible:false,lastValueVisible:false});
-  bbLS=chart.addLineSeries({color:'rgba(255,215,0,.3)',lineWidth:1,lineStyle:2,priceLineVisible:false,lastValueVisible:false});
-  new ResizeObserver(()=>{if(chart)chart.applyOptions({width:el.clientWidth,height:el.clientHeight});}).observe(el);
+function setDot(type) {
+  $('sdot').className = `dot ${type}`;
+}
+function setConn(msg, type='warn') {
+  setDot(type);
+  $('conn-lbl').textContent = msg;
+  $('conn-lbl').style.color = type==='ok' ? 'var(--green)' : type==='err' ? 'var(--red)' : 'var(--gold)';
+}
+function setStatus(msg, type='warn') {
+  const e = $('stlbl');
+  e.textContent = msg;
+  e.style.color = type==='ok' ? 'var(--green)' : type==='err' ? 'var(--red)' : 'var(--gold)';
+}
+function setLtx(t, src='') {
+  $('ltx').innerHTML = t.replace(/\n/g,'<br>');
+  $('src-info').textContent = src;
+}
+function showRetry() { $('retry-btn').style.display = 'block'; }
+function hideRetry() { $('retry-btn').style.display = 'none'; }
+function hideLoader() {
+  const lo = $('lo');
+  lo.style.opacity = '0';
+  setTimeout(() => { lo.style.display = 'none'; }, 300);
 }
 
-// ── WEBSOCKET — No CORS, works everywhere ──────────────────────
-function startWS(){
-  // Strategy:
-  // 1. Connect to Binance WebSocket stream (CORS-FREE by nature)
-  // 2. Subscribe to kline 5m stream for live candles
-  // 3. Also fetch historical candles via REST (try multiple proxies)
-  // 4. Even if REST fails, WS alone will build candles over time
+// ── CLOCK ────────────────────────────────────────────────────────
+setInterval(() => {
+  const n = new Date();
+  $('clk').textContent = `${ph(n.getUTCHours())}:${ph(n.getUTCMinutes())}:${ph(n.getUTCSeconds())}`;
+}, 1000);
 
-  const sym = PAIR==='BTC' ? 'btcusdt' : 'paxgusdt';
-  const wsUrl = `wss://stream.binance.com:9443/ws/${sym}@kline_5m`;
+setInterval(() => {
+  const n = new Date();
+  const elapsed = (n.getUTCMinutes() % 5) * 60 + n.getUTCSeconds();
+  const rem = 300 - elapsed;
+  const el = $('ctimer');
+  el.textContent = `${Math.floor(rem/60)}:${ph(rem%60)}`;
+  el.classList.toggle('urg', rem <= 15);
+}, 1000);
 
-  setStatus('warn','CONNECTING WEBSOCKET...');
-  setLtxt('CONNECTING WEBSOCKET...\n(No CORS – Works Everywhere)');
-
+// ── AUDIO ────────────────────────────────────────────────────────
+function ding() {
+  if (!sndOn) return;
   try {
-    ws = new WebSocket(wsUrl);
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const o = ctx.createOscillator(), g = ctx.createGain();
+    o.connect(g); g.connect(ctx.destination);
+    o.type = 'sine';
+    o.frequency.setValueAtTime(880, ctx.currentTime);
+    o.frequency.exponentialRampToValueAtTime(440, ctx.currentTime + 0.3);
+    g.gain.setValueAtTime(0.3, ctx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.5);
+    o.start(); o.stop(ctx.currentTime + 0.5);
+  } catch(e) {}
+}
+function toggleSnd() { sndOn = !sndOn; $('sndbtn').textContent = sndOn ? '🔔' : '🔕'; }
 
-    ws.onopen = ()=>{
-      setStatus('ok','WS LIVE ✓ — LOADING HISTORY...');
-      document.getElementById('conn-lbl').textContent='WS LIVE';
-      // Try to load historical candles in parallel
-      loadHistory();
-    };
+// ── PAIR SWITCH ──────────────────────────────────────────────────
+function switchPair(p) {
+  if (p === PAIR) return;
+  PAIR = p;
+  $('btn-btc').classList.toggle('on', p === 'BTC');
+  $('btn-xau').classList.toggle('on', p === 'XAU');
+  candles = []; lastSigKey = null; openPx = null; chartReady = false;
+  $('cprice').textContent = '---.--';
+  resetSig();
+  $('lo').style.display = 'flex';
+  $('lo').style.opacity = '1';
+  hideRetry();
+  setLtx('SWITCHING PAIR...', '');
+  closeAllWS();
+  clearInterval(updateTimer);
+  if (chart) { chart.remove(); chart = null; }
+  initChart();
+  startAll();
+}
 
-    ws.onmessage = (ev)=>{
-      try{
-        const msg=JSON.parse(ev.data);
-        if(!msg.k) return;
-        const k=msg.k;
-        const candle={
-          time:Math.floor(k.t/1000),
-          open:parseFloat(k.o),high:parseFloat(k.h),
-          low:parseFloat(k.l),close:parseFloat(k.c),
-        };
-        upsertCandle(candle);
-        updatePxDisplay(candle.close);
-
-        if(candles.length>=2&&!candlesReady){
-          candlesReady=true;
-          document.getElementById('loverlay').style.display='none';
-          setStatus('ok',`WS LIVE ✓ • ${PAIR==='BTC'?'BTC/USDT':'XAU/USD'}`);
-        }
-        if(candlesReady
+// ── CHART INIT ───────────────────────────────────────────────────
+function initChart() {
+  const el = $('chart');
+  chart = LightweightCharts.createChart(el, {
+    width: el.clientWidth, height: el.clientHeight,
+    layout: { background: { color: '#07080D' }, textColor: '#4A4A6
