@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>APEX SIGNALS — Premium Trading Terminal</title>
+<script src="https://unpkg.com/lightweight-charts/dist/lightweight-charts.standalone.production.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Share+Tech+Mono&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --gold: #FFD700;
+    --gold-dim: #B8960C;
+    --gold-glow: rgba(255,215,0,0.25);
+    --gold-deep: #7A6000;
+    --bg-black: #020305;
+    --bg-panel: #08090F;
+    --bg-card: #0C0E18;
+    --bg-border: #1A1D2E;
+    --green: #00FF88;
+    --green-dim: #00CC66;
+    --green-glow: rgba(0,255,136,0.2);
+    --red: #FF2D55;
+    --red-dim: #CC1133;
+    --red-glow: rgba(255,45,85,0.2);
+    --text-primary: #E8E8F0;
+    --text-dim: #5A5A7A;
+    --text-muted: #2A2A3A;
+    --blue: #4A9EFF;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg-black);
+    color: var(--text-primary);
+    font-family: 'Rajdhani', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Scanline overlay */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(0,0,0,0.03) 2px,
+      rgba(0,0,0,0.03) 4px
+    );
+    pointer-events: none;
+    z-index: 9999;
+  }
+
+  /* Corner decorations */
+  .corner-deco {
+    position: fixed;
+    width: 60px;
+    height: 60px;
+    z-index: 100;
+  }
+  .corner-deco.tl { top: 0; left: 0; border-top: 2px solid var(--gold); border-left: 2px solid var(--gold); }
+  .corner-deco.tr { top: 0; right: 0; border-top: 2px solid var(--gold); border-right: 2px solid var(--gold); }
+  .corner-deco.bl { bottom: 0; left: 0; border-bottom: 2px solid var(--gold); border-left: 2px solid var(--gold); }
+  .corner-deco.br { bottom: 0; right: 0; border-bottom: 2px solid var(--gold); border-right: 2px solid var(--gold); }
+
+  /* Header */
+  .header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 24px;
+    background: var(--bg-panel);
+    border-bottom: 1px solid var(--bg-border);
+    position: relative;
+  }
+  .header::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  }
+
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .logo-icon {
+    width: 36px; height: 36px;
+    background: linear-gradient(135deg, var(--gold), var(--gold-dim));
+    clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px;
+    animation: pulse-logo 3s ease-in-out infinite;
+  }
+  @keyframes pulse-logo {
+    0%,100% { box-shadow: 0 0 10px var(--gold-glow); }
+    50% { box-shadow: 0 0 25px var(--gold-glow), 0 0 50px rgba(255,215,0,0.1); }
+  }
+  .logo-text {
+    font-family: 'Orbitron', monospace;
+    font-size: 18px;
+    font-weight: 900;
+    color: var(--gold);
+    letter-spacing: 4px;
+    text-shadow: 0 0 20px var(--gold-glow);
+  }
+  .logo-sub {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 9px;
+    color: var(--text-dim);
+    letter-spacing: 3px;
+    margin-top: 2px;
+  }
+
+  /* Pair Switcher */
+  .pair-switcher {
+    display: flex;
+    background: var(--bg-card);
+    border: 1px solid var(--bg-border);
+    border-radius: 4px;
+    overflow: hidden;
+    position: relative;
+  }
+  .pair-btn {
+    padding: 8px 20px;
+    background: transparent;
+    border: none;
+    color: var(--text-dim);
+    font-family: 'Orbitron', monospace;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    cursor: pointer;
+    transition: all 0.3s;
+    position: relative;
+    z-index: 1;
+  }
+  .pair-btn.active {
+    color: var(--bg-black);
+    background: linear-gradient(135deg, var(--gold), var(--gold-dim));
+    text-shadow: none;
+    box-shadow: 0 0 15px var(--gold-glow);
+  }
+  .pair-btn:not(.active):hover { color: var(--gold); }
+
+  /* Status bar */
+  .status-bar {
+    display: flex;
+    gap: 24px;
+    align-items: center;
+  }
+  .status-item {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+  }
+  .status-label {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 9px;
+    color: var(--text-dim);
+    letter-spacing: 2px;
+  }
+  .status-value {
+    font-family: 'Orbitron', monospace;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--gold);
+  }
+  .live-dot {
+    width: 8px; height: 8px;
+    background: var(--green);
+    border-radius: 50%;
+    box-shadow: 0 0 8px var(--green);
+    animation: blink 1.5s ease-in-out infinite;
+  }
+  @keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: 0.2; } }
+
+  /* Main layout */
+  .main {
+    display: grid;
+    grid-template-columns: 1fr 300px;
+    gap: 0;
+    height: calc(100vh - 65px);
+  }
+
+  /* Chart area */
+  .chart-area {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    border-right: 1px solid var(--bg-border);
+  }
+
+  .chart-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 20px;
+    background: var(--bg-panel);
+    border-bottom: 1px solid var(--bg-border);
+    flex-shrink: 0;
+  }
+
+  .price-display {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+  }
+  .current-price {
+    font-family: 'Orbitron', monospace;
+    font-size: 28px;
+    font-weight: 900;
+    color: var(--gold);
+    text-shadow: 0 0 20px var(--gold-glow);
+    letter-spacing: 1px;
+  }
+  .price-change {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 13px;
+    padding: 2px 8px;
+    border-radius: 3px;
+  }
+  .price-change.up { color: var(--green); background: rgba(0,255,136,0.1); }
+  .price-change.down { color: var(--red); background: rgba(255,45,85,0.1); }
+
+  /* Candle Timer */
+  .candle-timer-wrap {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .candle-timer-label {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 10px;
+    color: var(--text-dim);
+    letter-spacing: 2px;
+  }
+  .candle-timer {
+    font-family: 'Orbitron', monospace;
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--gold);
+    min-width: 50px;
+    text-align: center;
+    padding: 4px 12px;
+    background: var(--bg-card);
+    border: 1px solid var(--gold-deep);
+    border-radius: 4px;
+    text-shadow: 0 0 10px var(--gold-glow);
+  }
+  .candle-timer.urgent {
+    color: var(--red) !important;
+    border-color: var(--red-dim) !important;
+    text-shadow: 0 0 10px var(--red-glow) !important;
+    animation: shake 0.3s ease infinite;
+  }
+  @keyframes shake {
+    0%,100% { transform: translateX(0); }
+    25% { transform: translateX(-2px); }
+    75% { transform: translateX(2px); }
+  }
+
+  #chart-container {
+    flex: 1;
+    position: relative;
+  }
+
+  /* Indicator row */
+  .indicator-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1px;
+    background: var(--bg-border);
+    border-top: 1px solid var(--bg-border);
+    flex-shrink: 0;
+  }
+  .indicator-box {
+    background: var(--bg-card);
+    padding: 8px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .ind-label {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 9px;
+    color: var(--text-dim);
+    letter-spacing: 2px;
+  }
+  .ind-value {
+    font-family: 'Orbitron', monospace;
+    font-size: 14px;
+    font-weight: 700;
+  }
+  .ind-value.bull { color: var(--green); }
+  .ind-value.bear { color: var(--red); }
+  .ind-value.neutral { color: var(--gold); }
+
+  /* Sidebar */
+  .sidebar {
+    display: flex;
+    flex-direction: column;
+    background: var(--bg-panel);
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
+
+  /* Signal Box */
+  .signal-box {
+    padding: 20px 16px;
+    border-bottom: 1px solid var(--bg-border);
+    position: relative;
+    min-height: 180px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+  .signal-box::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at center, var(--signal-glow,transparent) 0%, transparent 70%);
+    pointer-events: none;
+    transition: all 0.5s;
+  }
+
+  .signal-waiting {
+    text-align: center;
+  }
+  .signal-wait-icon {
+    font-size: 36px;
+    margin-bottom: 8px;
+    opacity: 0.4;
+    animation: spin-slow 8s linear infinite;
+  }
+  @keyframes spin-slow { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+  .signal-wait-text {
+    font-family: 'Orbitron', monospace;
+    font-size: 10px;
+    color: var(--text-dim);
+    letter-spacing: 3px;
+  }
+
+  .signal-display {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    width: 100%;
+  }
+  .signal-type {
+    font-family: 'Orbitron', monospace;
+    font-size: 11px;
+    letter-spacing: 4px;
+    font-weight: 700;
+  }
+  .signal-main {
+    font-family: 'Orbitron', monospace;
+    font-size: 26px;
+    font-weight: 900;
+    letter-spacing: 2px;
+    text-align: center;
+    line-height: 1;
+    animation: signal-pulse 1s ease-in-out infinite;
+  }
+  @keyframes signal-pulse {
+    0%,100% { transform: scale(1); }
+    50% { transform: scale(1.04); }
+  }
+  .signal-main.buy { color: var(--green); text-shadow: 0 0 30px var(--green), 0 0 60px rgba(0,255,136,0.3); }
+  .signal-main.sell { color: var(--red); text-shadow: 0 0 30px var(--red), 0 0 60px rgba(255,45,85,0.3); }
+  .signal-strength-bar {
+    width: 100%;
+    height: 3px;
+    background: var(--bg-border);
+    border-radius: 2px;
+    overflow: hidden;
+    margin-top: 4px;
+  }
+  .signal-strength-fill {
+    height: 100%;
+    border-radius: 2px;
+    transition: width 0.5s;
+  }
+  .signal-strength-fill.buy { background: linear-gradient(90deg, var(--green-dim), var(--green)); box-shadow: 0 0 8px var(--green); }
+  .signal-strength-fill.sell { background: linear-gradient(90deg, var(--red-dim), var(--red)); box-shadow: 0 0 8px var(--red); }
+
+  /* Conditions Panel */
+  .conditions-panel {
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--bg-border);
+  }
+  .panel-title {
+    font-family: 'Orbitron', monospace;
+    font-size: 9px;
+    color: var(--gold);
+    letter-spacing: 3px;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .panel-title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, var(--gold-deep), transparent);
+  }
+
+  .condition-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--text-muted);
+  }
+  .condition-item:last-child { border-bottom: none; }
+  .cond-icon {
+    width: 24px; height: 24px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px;
+    flex-shrink: 0;
+    transition: all 0.3s;
+  }
+  .cond-icon.pass { background: var(--green-glow); border: 1px solid var(--green); color: var(--green); }
+  .cond-icon.fail { background: var(--text-muted); border: 1px solid var(--bg-border); color: var(--text-dim); }
+  .cond-icon.warn { background: rgba(255,215,0,0.1); border: 1px solid var(--gold-deep); color: var(--gold); }
+  .cond-info { flex: 1; }
+  .cond-name {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-primary);
+    letter-spacing: 1px;
+  }
+  .cond-detail {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 10px;
+    color: var(--text-dim);
+    margin-top: 1px;
+  }
+  .cond-status {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 9px;
+    padding: 2px 6px;
+    border-radius: 3px;
+    letter-spacing: 1px;
+  }
+  .cond-status.pass { color: var(--green); background: var(--green-glow); }
+  .cond-status.fail { color: var(--text-dim); background: var(--text-muted); }
+
+  /* History */
+  .history-panel {
+    padding: 14px 16px;
+    flex: 1;
+  }
+  .history-list { display: flex; flex-direction: column; gap: 6px; }
+  .history-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 10px;
+    background: var(--bg-card);
+    border: 1px solid var(--bg-border);
+    border-radius: 3px;
+    border-left-width: 3px;
+  }
+  .history-item.buy { border-left-color: var(--green); }
+  .history-item.sell { border-left-color: var(--red); }
+  .history-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .history-dot.buy { background: var(--green); }
+  .history-dot.sell { background: var(--red); }
+  .history-info { flex: 1; }
+  .history-type {
+    font-family: 'Orbitron', monospace;
+    font-size: 10px;
+    font-weight: 700;
+  }
+  .history-type.buy { color: var(--green); }
+  .history-type.sell { color: var(--red); }
+  .history-time {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 9px;
+    color: var(--text-dim);
+  }
+  .history-price {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 11px;
+    color: var(--text-primary);
+  }
+
+  /* Loading overlay */
+  .loading-overlay {
+    position: absolute;
+    inset: 0;
+    background: var(--bg-card);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+    gap: 20px;
+  }
+  .loading-spinner {
+    width: 50px; height: 50px;
+    border: 2px solid var(--bg-border);
+    border-top-color: var(--gold);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .loading-text {
+    font-family: 'Orbitron', monospace;
+    font-size: 10px;
+    color: var(--text-dim);
+    letter-spacing: 4px;
+  }
+
+  /* Sound toggle */
+  .sound-btn {
+    background: var(--bg-card);
+    border: 1px solid var(--bg-border);
+    color: var(--text-dim);
+    padding: 6px 12px;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.2s;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 12px;
+  }
+  .sound-btn.on { color: var(--gold); border-color: var(--gold-deep); }
+  .sound-btn:hover { border-color: var(--gold-deep); }
+
+  /* Scrollbar */
+  .sidebar::-webkit-scrollbar { width: 4px; }
+  .sidebar::-webkit-scrollbar-track { background: var(--bg-panel); }
+  .sidebar::-webkit-scrollbar-thumb { background: var(--bg-border); border-radius: 2px; }
+
+  /* Mobile */
+  @media (max-width: 768px) {
+    .main {
+      grid-template-columns: 1fr;
+      grid-template-rows: auto auto;
+      height: auto;
+    }
+    .chart-area { height: 55vh; }
+    .sidebar { max-height: none; }
+    .header { flex-wrap: wrap; gap: 10px; }
+    .status-bar { display: none; }
+    .current-price { font-size: 20px; }
+    .indicator-row { grid-template-columns: repeat(2, 1fr); }
+    .signal-main { font-size: 20px; }
+    .logo-text { font-size: 14px; letter-spacing: 2px; }
+    .corner-deco { display: none; }
+  }
+
+  /* Flash animation for new signal */
+  @keyframes flash-buy {
+    0%,100% { box-shadow: inset 0 0 0px transparent; }
+    50% { box-shadow: inset 0 0 40px rgba(0,255,136,0.15); }
+  }
+  @keyframes flash-sell {
+    0%,100% { box-shadow: inset 0 0 0px transparent; }
+    50% { box-shadow: inset 0 0 40px rgba(255,45,85,0.15); }
+  }
+  .flash-buy { animation: flash-buy 0.6s ease 3; }
+  .flash-sell { animation: flash-sell 0.6s ease 3; }
+
+  /* Ticker tape */
+  .ticker {
+    background: var(--bg-card);
+    border-top: 1px solid var(--bg-border);
+    padding: 6px 0;
+    overflow: hidden;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 11px;
+    color: var(--text-dim);
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+  .ticker-inner {
+    display: inline-block;
+    animation: ticker-scroll 30s linear infinite;
+  }
+  @keyframes ticker-scroll {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+  }
+  .ticker-item { display: inline-block; margin: 0 40px; }
+  .ticker-item span { color: var(--gold); margin-left: 8px; }
+  .ticker-item .up { color: var(--green); }
+  .ticker-item .dn { color: var(--red); }
+
+  /* Connection error */
+  .error-msg {
+    background: rgba(255,45,85,0.1);
+    border: 1px solid var(--red-dim);
+    border-radius: 4px;
+    padding: 8px 14px;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 10px;
+    color: var(--red);
+    letter-spacing: 1px;
+    margin: 8px 16px;
+    display: none;
+  }
+</style>
+</head>
+<body>
+
+<div class="corner-deco tl"></div>
+<div class="corner-deco tr"></div>
+<div class="corner-deco bl"></div>
+<div class="corner-deco br"></div>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="logo">
+    <div class="logo-icon">⬡</div>
+    <div>
+      <div class="logo-text">APEX SIGNALS</div>
+      <div class="logo-sub">TRIPLE CONFIRMATION ENGINE v3.0</div>
+    </div>
+  </div>
+
+  <div class="pair-switcher">
+    <button class="pair-btn active" id="btn-btc" onclick="switchPair('BTCUSDT')">BTC/USDT</button>
+    <button class="pair-btn" id="btn-xau" onclick="switchPair('XAUUSD')">XAU/USD</button>
+  </div>
+
+  <div class="status-bar">
+    <div class="status-item">
+      <div class="status-label">TIMEFRAME</div>
+      <div class="status-value">5M</div>
+    </div>
+    <div class="status-item">
+      <div class="status-label">STATUS</div>
+      <div class="status-value" style="display:flex;align-items:center;gap:6px;"><div class="live-dot"></div> LIVE</div>
+    </div>
+    <div class="status-item" id="header-time">
+      <div class="status-label">UTC TIME</div>
+      <div class="status-value" id="clock-display">--:--:--</div>
+    </div>
+    <button class="sound-btn on" id="sound-btn" onclick="toggleSound()">🔔 SOUND</button>
+  </div>
+</div>
+
+<!-- MAIN LAYOUT -->
+<div class="main">
+  <!-- CHART AREA -->
+  <div class="chart-area">
+    <div class="chart-header">
+      <div class="price-display">
+        <div class="current-price" id="current-price">---.--</div>
+        <div class="price-change up" id="price-change">+0.00%</div>
+      </div>
+      <div class="candle-timer-wrap">
+        <div class="candle-timer-label">CANDLE CLOSE</div>
+        <div class="candle-timer" id="candle-timer">5:00</div>
+      </div>
+    </div>
+
+    <div id="chart-container">
+      <div class="loading-overlay" id="loading-overlay">
+        <div class="loading-spinner"></div>
+        <div class="loading-text">CONNECTING TO MARKET DATA</div>
+      </div>
+    </div>
+
+    <div class="indicator-row">
+      <div class="indicator-box">
+        <div class="ind-label">EMA 9 / EMA 21</div>
+        <div class="ind-value neutral" id="ema-display">— / —</div>
+      </div>
+      <div class="indicator-box">
+        <div class="ind-label">RSI (14)</div>
+        <div class="ind-value neutral" id="rsi-display">—</div>
+      </div>
+      <div class="indicator-box">
+        <div class="ind-label">BOLL UPPER / LOWER</div>
+        <div class="ind-value neutral" id="bb-display">— / —</div>
+      </div>
+      <div class="indicator-box">
+        <div class="ind-label">MACD HIST</div>
+        <div class="ind-value neutral" id="macd-display">—</div>
+      </div>
+    </div>
+
+    <div class="ticker">
+      <div class="ticker-inner" id="ticker-content">
+        <span class="ticker-item">BTC/USDT <span class="up">▲ Loading...</span></span>
+        <span class="ticker-item">XAU/USD <span class="up">▲ Loading...</span></span>
+        <span class="ticker-item">ETH/USDT <span class="up">▲ Loading...</span></span>
+        <span class="ticker-item">BNB/USDT <span class="up">▲ Loading...</span></span>
+        <span class="ticker-item">SOL/USDT <span class="up">▲ Loading...</span></span>
+        <span class="ticker-item">BTC/USDT <span class="up">▲ Loading...</span></span>
+        <span class="ticker-item">XAU/USD <span class="up">▲ Loading...</span></span>
+        <span class="ticker-item">ETH/USDT <span class="up">▲ Loading...</span></span>
+        <span class="ticker-item">BNB/
